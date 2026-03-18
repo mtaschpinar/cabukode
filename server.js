@@ -303,12 +303,12 @@ app.get('/salon/:slug', (req, res) => {
 
 // Salon müşteri sayfası - yeni kısa yol /:slug
 app.get('/:slug', (req, res, next) => {
-  const reserved = ['admin', 'api', 'uploads'];
+  const reserved = ['admin', 'api', 'uploads', 'favicon.ico'];
   if (reserved.includes(req.params.slug)) return next();
-  db.salons.findOne({ slug: req.params.slug }, (err, doc) => {
-    if (!doc) return next();
-    res.sendFile(path.join(__dirname, 'public/salon.html'));
-  });
+  // Slug uzunluğu kontrolü - çok kısa veya çok uzunsa atla
+  if (req.params.slug.length < 2 || req.params.slug.length > 60) return next();
+  // Salon var ya da yok, salon.html'i gönder (sayfa kendi içinde API'den kontrol eder)
+  res.sendFile(path.join(__dirname, 'public/salon.html'));
 });
 
 // Admin paneli
