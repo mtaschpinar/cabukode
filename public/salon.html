@@ -434,7 +434,9 @@
   <div class="toast" id="toast">✅ Kopyalandı!</div>
 
 <script>
-const slug = location.pathname.split('/salon/')[1];
+// /salon/xxx veya /xxx yollarını destekle
+const _parts = location.pathname.split('/');
+const slug = _parts[1] === 'salon' ? _parts[2] : _parts[1];
 
 async function loadSalon(){
   try{

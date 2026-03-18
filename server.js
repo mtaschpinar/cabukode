@@ -9,6 +9,30 @@ const fs   = require('fs');
 const app  = express();
 const PORT = process.env.PORT || 8091;
 
+// Türkçe karakterleri düzelterek URL-uyumlu slug oluştur
+function toSlug(text) {
+  return text
+    .toLowerCase()
+    .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+    .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]+/g, '')
+    .slice(0, 40);
+}
+
+// Benzersiz slug üret (çakışma varsa sayı ekle)
+async function generateSlug(base) {
+  return new Promise((resolve) => {
+    const trySlug = (s, n) => {
+      const candidate = n ? `${s}${n}` : s;
+      db.salons.findOne({ slug: candidate }, (err, doc) => {
+        if (!doc) resolve(candidate);
+        else trySlug(s, (n || 1) + 1);
+      });
+    };
+    trySlug(base, 0);
+  });
+}
+
 // ── Veritabanları ────────────────────────────────────────────────────────────
 const db = {};
 db.salons  = new Datastore({ filename: path.join(__dirname, 'data/salons.db'),  autoload: true });
@@ -50,8 +74,10 @@ app.get('/api/salons/:slug', (req, res) => {
 // Salon ekle
 app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',maxCount:1}]), async (req, res) => {
   try {
-    const { name, ownerName, bank, iban, phone, address, services } = req.body;
-    const slug = uuidv4().split('-')[0];
+    const { name, ownerName, bank, iban, phone, address, services, customSlug } = req.body;
+    // Özel slug varsa onu kullan, yoksa salon adından otomatik oluştur
+    const slugBase = customSlug ? toSlug(customSlug) : toSlug(ownerName || name);
+    const slug = await generateSlug(slugBase || uuidv4().split('-')[0]);
     const logoUrl  = req.files?.logo?.[0]  ? '/uploads/' + req.files.logo[0].filename  : null;
     const coverUrl = req.files?.cover?.[0] ? '/uploads/' + req.files.cover[0].filename : null;
 
@@ -270,9 +296,19 @@ app.delete('/api/reviews/:id', (req, res) => {
 
 // ── SAYFA ROTALARI ─────────────────────────────────────────────
 
-// Salon müşteri sayfası
+// Salon müşteri sayfası - eski /salon/:slug yolu (geriye dönük uyumluluk)
 app.get('/salon/:slug', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/salon.html'));
+});
+
+// Salon müşteri sayfası - yeni kısa yol /:slug
+app.get('/:slug', (req, res, next) => {
+  const reserved = ['admin', 'api', 'uploads'];
+  if (reserved.includes(req.params.slug)) return next();
+  db.salons.findOne({ slug: req.params.slug }, (err, doc) => {
+    if (!doc) return next();
+    res.sendFile(path.join(__dirname, 'public/salon.html'));
+  });
 });
 
 // Admin paneli

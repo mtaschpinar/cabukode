@@ -126,6 +126,14 @@
       </div>
 
       <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label>Sayfa Adresi <span style="color:var(--muted);font-weight:400">(cabukode.com/<b id="slugPreview">ahmetenckuafor</b>)</span></label>
+          <input type="text" id="f_customSlug" placeholder="ahmetenckuafor" oninput="document.getElementById('slugPreview').textContent=this.value||'...'" style="font-family:monospace"/>
+          <small style="color:var(--muted)">Boş bırakırsanız hesap sahibi adından otomatik oluşturulur.</small>
+        </div>
+      </div>
+
+      <div class="form-row">
         <div class="form-group">
           <label>Banka *</label>
           <select id="f_bank" required>
@@ -351,6 +359,8 @@ function openEditModal(salon){
   document.getElementById('f_iban').value=fmtIBAN(salon.iban);
   document.getElementById('f_phone').value=salon.phone||'';
   document.getElementById('f_address').value=salon.address||'';
+  document.getElementById('f_customSlug').value=salon.slug||'';
+  document.getElementById('slugPreview').textContent=salon.slug||'...';
   document.getElementById('servicesList').innerHTML='';
   (salon.services||[]).forEach(s=>addServiceRow(s.name,s.price));
   if(salon.logoUrl){
@@ -376,6 +386,8 @@ document.getElementById('salonForm').addEventListener('submit', async e=>{
   fd.append('phone',  document.getElementById('f_phone').value);
   fd.append('address',document.getElementById('f_address').value);
   fd.append('services', JSON.stringify(getServices()));
+  const customSlug = document.getElementById('f_customSlug').value.trim();
+  if(customSlug) fd.append('customSlug', customSlug);
   const logo=document.getElementById('f_logo').files[0];
   if(logo) fd.append('logo', logo);
   const cover=document.getElementById('f_cover').files[0];
@@ -422,7 +434,7 @@ async function loadSalons(){
         <button class="btn btn-gold" onclick="openStats('${s.slug}','${s.name}')">📊 İstatistik</button>
         <button class="btn btn-ghost" onclick='openEditModal(${JSON.stringify(s)})'>✏️ Düzenle</button>
         <button class="btn btn-danger" onclick="deleteSalon('${s.slug}')">🗑</button>
-        <a class="btn btn-ghost" href="/salon/${s.slug}" target="_blank">🔗 Sayfa</a>
+        <a class="btn btn-ghost" href="/${s.slug}" target="_blank">🔗 Sayfa</a>
       </div>
     </div>`).join('');
 }
