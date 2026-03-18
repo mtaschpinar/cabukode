@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Çabuk — Admin Panel</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#0f0f1a;--card:#1a1a2e;--card2:#16213e;
+      --accent:#e94560;--green:#00c896;--gold:#f5a623;
+      --text:#fff;--muted:#9999bb;--border:#2e2e4a;
+    }
+    body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+    /* NAV */
+    nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+    .logo{font-size:22px;font-weight:900;color:var(--accent);letter-spacing:-0.5px}
+    .logo span{color:var(--text)}
+    .nav-btn{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer}
+    .nav-btn:hover{opacity:.85}
+    /* LAYOUT */
+    .container{max-width:1100px;margin:0 auto;padding:28px 20px}
+    h2{font-size:20px;font-weight:800;margin-bottom:20px}
+    /* SALON CARDS */
+    .salon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:32px}
+    .salon-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+    .salon-card-top{display:flex;align-items:center;gap:14px}
+    .salon-logo{width:54px;height:54px;border-radius:12px;object-fit:cover;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+    .salon-logo img{width:100%;height:100%;object-fit:cover}
+    .salon-info h3{font-size:16px;font-weight:800}
+    .salon-info p{font-size:12px;color:var(--muted);margin-top:2px}
+    .iban-badge{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:'Courier New',monospace;font-size:12px;color:var(--muted);word-break:break-all}
+    .salon-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .btn{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
+    .btn:hover{opacity:.8}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-green{background:var(--green);color:#fff}
+    .btn-gold{background:var(--gold);color:#000}
+    .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+    .btn-danger{background:#c0392b;color:#fff}
+    /* MODAL */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;overflow-y:auto;padding:20px}
+    .overlay.show{display:flex;align-items:flex-start;justify-content:center}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:560px;margin:auto}
+    .modal h3{font-size:18px;font-weight:800;margin-bottom:20px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none}
+    .form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+    .form-group textarea{resize:vertical;min-height:70px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    /* Hizmetler */
+    .services-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .service-item{display:flex;gap:8px;align-items:center}
+    .service-item input{flex:1}
+    .service-item input.price{width:100px;flex:none}
+    .add-service-btn{background:var(--card2);border:1px dashed var(--border);color:var(--muted);border-radius:8px;padding:8px;font-size:13px;cursor:pointer;width:100%;margin-top:6px}
+    .add-service-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .remove-btn{background:none;border:none;color:#c0392b;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+    /* QR Modal */
+    .qr-box{text-align:center;padding:20px 0}
+    .qr-box img{width:220px;height:220px;border-radius:12px;border:4px solid var(--border)}
+    .qr-url{font-size:12px;color:var(--muted);word-break:break-all;margin:12px 0;background:var(--card2);padding:10px;border-radius:8px}
+    /* Stats preview */
+    .stats-row{display:flex;gap:10px;flex-wrap:wrap}
+    .stat-chip{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;text-align:center}
+    .stat-chip .num{font-size:22px;font-weight:900;color:var(--accent)}
+    .stat-chip .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+    /* Empty state */
+    .empty{text-align:center;padding:60px 20px;color:var(--muted)}
+    .empty .icon{font-size:48px;margin-bottom:12px}
+    /* Toast */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--green);color:#fff;padding:12px 24px;border-radius:50px;font-size:14px;font-weight:700;transition:transform .3s;z-index:999}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+    /* Logo preview */
+    .logo-preview{width:80px;height:80px;border-radius:12px;object-fit:cover;border:2px solid var(--border);display:none;margin-top:8px}
+    .logo-preview.show{display:block}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Çabuk<span>.</span></div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <button class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted)" onclick="showTab('salons')">Salonlar</button>
+    <button class="nav-btn" style="background:var(--gold);color:#000" onclick="showTab('ads')">Reklamlar</button>
+    <button class="nav-btn" onclick="openAddModal()">+ Yeni Salon</button>
+  </div>
+</nav>
+
+<!-- SALONLAR SEKMESİ -->
+<div class="container" id="tabSalons">
+  <h2>Kayıtlı Salonlar</h2>
+  <div class="salon-grid" id="salonGrid">
+    <div class="empty"><div class="icon">✂️</div><p>Henüz salon eklenmedi.<br>Sağ üstten ekleyin.</p></div>
+  </div>
+</div>
+
+<!-- REKLAMLAR SEKMESİ -->
+<div class="container" id="tabAds" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="margin-bottom:0">Reklam Yönetimi</h2>
+    <button class="btn btn-gold" onclick="openAdModal()">+ Yeni Reklam</button>
+  </div>
+  <div class="salon-grid" id="adsGrid">
+    <div class="empty"><div class="icon">📢</div><p>Henüz reklam eklenmedi.</p></div>
+  </div>
+</div>
+
+<!-- EKLE / DÜZENLE MODAL -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <h3 id="modalTitle">Yeni Salon Ekle</h3>
+    <form id="salonForm" enctype="multipart/form-data">
+      <input type="hidden" id="editSlug"/>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Salon Adı *</label>
+          <input type="text" id="f_name" placeholder="Ahmet Kuaför" required/>
+        </div>
+        <div class="form-group">
+          <label>Hesap Sahibi *</label>
+          <input type="text" id="f_owner" placeholder="Ahmet Enç" required/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Banka *</label>
+          <select id="f_bank" required>
+            <option value="">Seçin...</option>
+            <option>Akbank T.A.Ş.</option>
+            <option>Garanti BBVA</option>
+            <option>Ziraat Bankası</option>
+            <option>Türkiye İş Bankası</option>
+            <option>Yapı Kredi</option>
+            <option>VakıfBank</option>
+            <option>Halkbank</option>
+            <option>DenizBank</option>
+            <option>QNB Finansbank</option>
+            <option>TEB</option>
+            <option>Papara</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>IBAN *</label>
+          <input type="text" id="f_iban" placeholder="TR36 0004 6002 7188 8000 2167 05" required/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Telefon</label>
+          <input type="text" id="f_phone" placeholder="0532 123 45 67"/>
+        </div>
+        <div class="form-group">
+          <label>Adres</label>
+          <input type="text" id="f_address" placeholder="Mahalle, İlçe"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Logo (max 2MB)</label>
+        <input type="file" id="f_logo" accept="image/*" onchange="previewLogo(this)"/>
+        <img id="logoPreview" class="logo-preview" src="" alt=""/>
+      </div>
+      <div class="form-group">
+        <label>Kapak Görseli / Cover (max 5MB) — Banner arka planı</label>
+        <input type="file" id="f_cover" accept="image/*" onchange="previewCover(this)"/>
+        <img id="coverPreview" class="logo-preview" style="width:100%;height:80px;border-radius:10px;" src="" alt=""/>
+      </div>
+
+      <div class="form-group">
+        <label>Hizmet Tarifesi</label>
+        <div class="services-list" id="servicesList"></div>
+        <button type="button" class="add-service-btn" onclick="addServiceRow()">+ Hizmet Ekle</button>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="submit" class="btn btn-primary" style="flex:1;padding:13px">Kaydet</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal('addOverlay')">İptal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- QR MODAL -->
+<div class="overlay" id="qrOverlay">
+  <div class="modal" style="max-width:400px">
+    <h3>QR Kod</h3>
+    <div class="qr-box">
+      <img id="qrImg" src="" alt="QR"/>
+      <div class="qr-url" id="qrUrl"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <a id="qrDownload" class="btn btn-primary" download="qr.png">⬇ İndir</a>
+        <button class="btn btn-green" onclick="copyQrUrl()">🔗 Linki Kopyala</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:12px" onclick="closeModal('qrOverlay')">Kapat</button>
+  </div>
+</div>
+
+<!-- İSTATİSTİK MODAL -->
+<div class="overlay" id="statsOverlay">
+  <div class="modal" style="max-width:600px">
+    <h3 id="statsTitle">İstatistikler</h3>
+    <div class="stats-row" id="statsRow" style="margin-bottom:20px"></div>
+    <h4 style="font-size:14px;color:var(--muted);margin-bottom:12px">Saatlik Dağılım (Bugün)</h4>
+    <canvas id="hourlyChart" height="120"></canvas>
+    <h4 style="font-size:14px;color:var(--muted);margin:16px 0 10px">Son Ziyaretler</h4>
+    <div id="visitList" style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+    <button class="btn btn-ghost" style="width:100%;margin-top:16px" onclick="closeModal('statsOverlay')">Kapat</button>
+  </div>
+</div>
+
+<!-- REKLAM EKLE/DÜZENLE MODAL -->
+<div class="overlay" id="adOverlay">
+  <div class="modal">
+    <h3 id="adModalTitle">Yeni Reklam Ekle</h3>
+    <form id="adForm" enctype="multipart/form-data">
+      <input type="hidden" id="ad_id"/>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Başlık *</label>
+          <input type="text" id="ad_title" placeholder="Saç Bakım Ürünleri %30 İndirimde" required/>
+        </div>
+        <div class="form-group">
+          <label>Alt Başlık</label>
+          <input type="text" id="ad_subtitle" placeholder="Profesyonel salon ürünleri"/>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tıklama Linki</label>
+          <input type="url" id="ad_link" placeholder="https://..."/>
+        </div>
+        <div class="form-group">
+          <label>Reklam Türü</label>
+          <select id="ad_type">
+            <option value="banner">Banner (Sayfa Üstü)</option>
+            <option value="inline">İçerik İçi (Orta)</option>
+            <option value="popup">Popup (Açılır Pencere)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Arka Plan Rengi</label>
+          <input type="color" id="ad_color" value="#0ea5e9" style="height:44px;cursor:pointer"/>
+        </div>
+        <div class="form-group">
+          <label>Görsel (isteğe bağlı)</label>
+          <input type="file" id="ad_image" accept="image/*"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Durum</label>
+        <select id="ad_active">
+          <option value="true">✅ Aktif (görünüyor)</option>
+          <option value="false">⏸️ Pasif (gizli)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="submit" class="btn btn-gold" style="flex:1;padding:13px">Kaydet</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal('adOverlay')">İptal</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Yardımcılar ───────────────────────────────────────────────
+function showToast(msg, color='#00c896'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.style.background=color;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function fmtIBAN(s){ return s.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s; }
+function fmtDate(d){
+  const dt=new Date(d);
+  return dt.toLocaleDateString('tr-TR')+' '+dt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── Hizmet satırı ─────────────────────────────────────────────
+function addServiceRow(name='', price=''){
+  const list=document.getElementById('servicesList');
+  const div=document.createElement('div');
+  div.className='service-item';
+  div.innerHTML=`
+    <input type="text" placeholder="Hizmet adı (ör: Saç Kesimi)" value="${name}"/>
+    <input type="number" class="price" placeholder="₺" value="${price}" min="0"/>
+    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  list.appendChild(div);
+}
+
+function getServices(){
+  const rows=document.querySelectorAll('#servicesList .service-item');
+  return Array.from(rows).map(r=>{
+    const inputs=r.querySelectorAll('input');
+    return { name: inputs[0].value.trim(), price: inputs[1].value };
+  }).filter(s=>s.name);
+}
+
+// ── Cover önizleme ─────────────────────────────────────────────
+function previewCover(input){
+  const prev=document.getElementById('coverPreview');
+  if(input.files&&input.files[0]){
+    const reader=new FileReader();
+    reader.onload=e=>{ prev.src=e.target.result; prev.classList.add('show'); };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+// ── Logo önizleme ─────────────────────────────────────────────
+function previewLogo(input){
+  const prev=document.getElementById('logoPreview');
+  if(input.files&&input.files[0]){
+    const reader=new FileReader();
+    reader.onload=e=>{ prev.src=e.target.result; prev.classList.add('show'); };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// ── Modal aç ──────────────────────────────────────────────────
+function openAddModal(){
+  document.getElementById('modalTitle').textContent='Yeni Salon Ekle';
+  document.getElementById('salonForm').reset();
+  document.getElementById('editSlug').value='';
+  document.getElementById('servicesList').innerHTML='';
+  document.getElementById('logoPreview').classList.remove('show');
+  document.getElementById('coverPreview').classList.remove('show');
+  document.getElementById('addOverlay').classList.add('show');
+}
+
+function openEditModal(salon){
+  document.getElementById('modalTitle').textContent='Salonu Düzenle';
+  document.getElementById('editSlug').value=salon.slug;
+  document.getElementById('f_name').value=salon.name;
+  document.getElementById('f_owner').value=salon.ownerName;
+  document.getElementById('f_bank').value=salon.bank;
+  document.getElementById('f_iban').value=fmtIBAN(salon.iban);
+  document.getElementById('f_phone').value=salon.phone||'';
+  document.getElementById('f_address').value=salon.address||'';
+  document.getElementById('servicesList').innerHTML='';
+  (salon.services||[]).forEach(s=>addServiceRow(s.name,s.price));
+  if(salon.logoUrl){
+    const prev=document.getElementById('logoPreview');
+    prev.src=salon.logoUrl; prev.classList.add('show');
+  }
+  if(salon.coverUrl){
+    const prev=document.getElementById('coverPreview');
+    prev.src=salon.coverUrl; prev.classList.add('show');
+  }
+  document.getElementById('addOverlay').classList.add('show');
+}
+
+// ── Form gönder ───────────────────────────────────────────────
+document.getElementById('salonForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const slug=document.getElementById('editSlug').value;
+  const fd=new FormData();
+  fd.append('name',   document.getElementById('f_name').value);
+  fd.append('ownerName', document.getElementById('f_owner').value);
+  fd.append('bank',   document.getElementById('f_bank').value);
+  fd.append('iban',   document.getElementById('f_iban').value);
+  fd.append('phone',  document.getElementById('f_phone').value);
+  fd.append('address',document.getElementById('f_address').value);
+  fd.append('services', JSON.stringify(getServices()));
+  const logo=document.getElementById('f_logo').files[0];
+  if(logo) fd.append('logo', logo);
+  const cover=document.getElementById('f_cover').files[0];
+  if(cover) fd.append('cover', cover);
+
+  const url    = slug ? `/api/salons/${slug}` : '/api/salons';
+  const method = slug ? 'PUT' : 'POST';
+  const res=await fetch(url,{method,body:fd});
+  const data=await res.json();
+  if(data.error){ showToast('Hata: '+data.error,'#e94560'); return; }
+  showToast(slug?'Salon güncellendi!':'Salon eklendi!');
+  closeModal('addOverlay');
+  loadSalons();
+});
+
+// ── Salonları yükle ───────────────────────────────────────────
+async function loadSalons(){
+  const res=await fetch('/api/salons');
+  const salons=await res.json();
+  const grid=document.getElementById('salonGrid');
+  if(!salons.length){
+    grid.innerHTML='<div class="empty"><div class="icon">✂️</div><p>Henüz salon eklenmedi.<br>Sağ üstten ekleyin.</p></div>';
+    return;
+  }
+  grid.innerHTML=salons.map(s=>`
+    <div class="salon-card">
+      <div class="salon-card-top">
+        <div class="salon-logo">
+          ${s.logoUrl ? `<img src="${s.logoUrl}" alt=""/>` : '✂️'}
+        </div>
+        <div class="salon-info">
+          <h3>${s.name}</h3>
+          <p>${s.ownerName} · ${s.bank}</p>
+          ${s.phone?`<p>📞 ${s.phone}</p>`:''}
+        </div>
+      </div>
+      <div class="iban-badge">${fmtIBAN(s.iban)}</div>
+      ${(s.services&&s.services.length)?`
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${s.services.map(sv=>`<span style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px">${sv.name} <strong style="color:var(--gold)">₺${sv.price}</strong></span>`).join('')}
+      </div>`:''}
+      <div class="salon-actions">
+        <button class="btn btn-green" onclick="showQR('${s.slug}')">📱 QR</button>
+        <button class="btn btn-gold" onclick="openStats('${s.slug}','${s.name}')">📊 İstatistik</button>
+        <button class="btn btn-ghost" onclick='openEditModal(${JSON.stringify(s)})'>✏️ Düzenle</button>
+        <button class="btn btn-danger" onclick="deleteSalon('${s.slug}')">🗑</button>
+        <a class="btn btn-ghost" href="/salon/${s.slug}" target="_blank">🔗 Sayfa</a>
+      </div>
+    </div>`).join('');
+}
+
+// ── QR göster ─────────────────────────────────────────────────
+async function showQR(slug){
+  const res=await fetch(`/api/salons/${slug}/qr`,{method:'POST'});
+  const data=await res.json();
+  document.getElementById('qrImg').src=data.qrUrl+'?t='+Date.now();
+  document.getElementById('qrUrl').textContent=data.pageUrl;
+  document.getElementById('qrDownload').href=data.qrUrl;
+  document.getElementById('qrOverlay').classList.add('show');
+}
+
+function copyQrUrl(){
+  const url=document.getElementById('qrUrl').textContent;
+  navigator.clipboard.writeText(url).then(()=>showToast('Link kopyalandı!'));
+}
+
+// ── Sil ───────────────────────────────────────────────────────
+async function deleteSalon(slug){
+  if(!confirm('Bu salonu silmek istediğinize emin misiniz?')) return;
+  await fetch(`/api/salons/${slug}`,{method:'DELETE'});
+  showToast('Salon silindi','#e94560');
+  loadSalons();
+}
+
+// ── İstatistikler ─────────────────────────────────────────────
+async function openStats(slug, name){
+  document.getElementById('statsTitle').textContent=name+' — İstatistikler';
+  const res=await fetch(`/api/stats/${slug}`);
+  const d=await res.json();
+
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-chip"><div class="num">${d.total}</div><div class="lbl">Toplam Ziyaret</div></div>
+    <div class="stat-chip"><div class="num">${d.todayTotal}</div><div class="lbl">Bugün</div></div>`;
+
+  // Saatlik chart (basit bar)
+  const canvas=document.getElementById('hourlyChart');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||520;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const max=Math.max(...d.hourly,1);
+  const bw=canvas.width/24;
+  d.hourly.forEach((v,i)=>{
+    const h=(canvas.height-20)*(v/max);
+    ctx.fillStyle=v>0?'#e94560':'#2e2e4a';
+    ctx.fillRect(i*bw+2,canvas.height-20-h,bw-4,h);
+    if(i%4===0){
+      ctx.fillStyle='#9999bb';
+      ctx.font='10px sans-serif';
+      ctx.fillText(i+':00',i*bw,canvas.height-4);
+    }
+  });
+
+  // Ziyaret listesi
+  document.getElementById('visitList').innerHTML=d.recent.length
+    ? d.recent.map(v=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted)">🕐 ${fmtDate(v.ts)}</div>`).join('')
+    : '<div style="color:var(--muted);font-size:13px">Henüz ziyaret yok.</div>';
+
+  document.getElementById('statsOverlay').classList.add('show');
+}
+
+// ── Sekme geçişi ─────────────────────────────────────────────────────────────────
+function showTab(tab){
+  document.getElementById('tabSalons').style.display = tab==='salons' ? 'block' : 'none';
+  document.getElementById('tabAds').style.display    = tab==='ads'    ? 'block' : 'none';
+  if(tab==='ads') loadAds();
+}
+
+// ── Reklam fonksiyonları ─────────────────────────────────────────────────────────────────
+const AD_TYPES = { banner: 'Banner (Sayfa Üstü)', inline: 'İçerik İçi', popup: 'Popup' };
+
+async function loadAds(){
+  const res = await fetch('/api/ads');
+  const ads = await res.json();
+  const grid = document.getElementById('adsGrid');
+  if(!ads.length){
+    grid.innerHTML = '<div class="empty"><div class="icon">📢</div><p>Henüz reklam eklenmedi.</p></div>';
+    return;
+  }
+  grid.innerHTML = ads.map(ad => `
+    <div class="salon-card">
+      <div class="salon-card-top">
+        <div class="salon-logo" style="background:${ad.bgColor||'#0ea5e9'}">
+          ${ad.imageUrl ? `<img src="${ad.imageUrl}" alt=""/>` : '📢'}
+        </div>
+        <div class="salon-info">
+          <h3>${ad.title}</h3>
+          <p>${ad.subtitle || ''} &bull; <span style="color:var(--gold)">${AD_TYPES[ad.type]||ad.type}</span></p>
+          <p style="margin-top:4px">
+            ${ad.active ? '<span style="color:var(--green)">✅ Aktif</span>' : '<span style="color:#c0392b">⏸️ Pasif</span>'}
+            &bull; 👁 ${ad.views||0} gösterim &bull; 🔗 ${ad.clicks||0} tıklama
+          </p>
+        </div>
+      </div>
+      ${ad.link ? `<div class="iban-badge">🔗 ${ad.link}</div>` : ''}
+      <div class="salon-actions">
+        <button class="btn btn-gold" onclick="editAd('${ad._id}')">Düzenle</button>
+        <button class="btn btn-ghost" onclick="toggleAd('${ad._id}', ${!ad.active})">${ad.active ? 'Pasif Yap' : 'Aktif Yap'}</button>
+        <button class="btn btn-danger" onclick="deleteAd('${ad._id}')">Sil</button>
+      </div>
+    </div>`).join('');
+}
+
+function openAdModal(ad=null){
+  document.getElementById('adModalTitle').textContent = ad ? 'Reklam Düzenle' : 'Yeni Reklam Ekle';
+  document.getElementById('ad_id').value      = ad?._id || '';
+  document.getElementById('ad_title').value   = ad?.title || '';
+  document.getElementById('ad_subtitle').value= ad?.subtitle || '';
+  document.getElementById('ad_link').value    = ad?.link || '';
+  document.getElementById('ad_color').value   = ad?.bgColor || '#0ea5e9';
+  document.getElementById('ad_type').value    = ad?.type || 'banner';
+  document.getElementById('ad_active').value  = ad?.active !== false ? 'true' : 'false';
+  document.getElementById('adOverlay').classList.add('show');
+}
+
+async function editAd(id){
+  const res = await fetch('/api/ads');
+  const ads = await res.json();
+  const ad = ads.find(a => a._id === id);
+  if(ad) openAdModal(ad);
+}
+
+async function toggleAd(id, active){
+  const fd = new FormData();
+  fd.append('active', active);
+  await fetch(`/api/ads/${id}`, { method: 'PUT', body: fd });
+  loadAds();
+  showToast(active ? 'Reklam aktif edildi' : 'Reklam pasif yapıldı');
+}
+
+async function deleteAd(id){
+  if(!confirm('Bu reklamı silmek istediğinizden emin misiniz?')) return;
+  await fetch(`/api/ads/${id}`, { method: 'DELETE' });
+  loadAds();
+  showToast('Reklam silindi', '#c0392b');
+}
+
+document.getElementById('adForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const id = document.getElementById('ad_id').value;
+  const fd = new FormData();
+  fd.append('title',    document.getElementById('ad_title').value);
+  fd.append('subtitle', document.getElementById('ad_subtitle').value);
+  fd.append('link',     document.getElementById('ad_link').value);
+  fd.append('type',     document.getElementById('ad_type').value);
+  fd.append('bgColor',  document.getElementById('ad_color').value);
+  fd.append('active',   document.getElementById('ad_active').value);
+  const img = document.getElementById('ad_image').files[0];
+  if(img) fd.append('image', img);
+
+  const url    = id ? `/api/ads/${id}` : '/api/ads';
+  const method = id ? 'PUT' : 'POST';
+  await fetch(url, { method, body: fd });
+  closeModal('adOverlay');
+  loadAds();
+  showToast(id ? 'Reklam güncellendi' : 'Reklam eklendi');
+});
+
+// ── Başlat ─────────────────────────────────────────────────────────────────
+loadSalons();
+</script>
+</body>
+</html>

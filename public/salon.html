@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+  <title>Çabuk — Ödeme</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    :root{
+      --bg:#f0f4f8;
+      --card:#ffffff;
+      --accent:#1a6ef5;
+      --accent-light:#eef3ff;
+      --green:#16a34a;
+      --green-light:#f0fdf4;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+    }
+    body{
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* REKLAM */
+    .ad-bar{background:#fff;border-bottom:1px solid var(--border);padding:8px 16px}
+    .ad-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+    .ad-inner{background:linear-gradient(135deg,#1a6ef5,#06b6d4);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+    .ad-icon{font-size:22px;flex-shrink:0}
+    .ad-text strong{font-size:13px;color:#fff;display:block;line-height:1.3}
+    .ad-text span{font-size:11px;color:rgba(255,255,255,.8)}
+    .ad-cta{margin-left:auto;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+
+    /* KAPSAYICI */
+    .container{flex:1;max-width:420px;margin:0 auto;width:100%;padding:20px 16px 40px;display:flex;flex-direction:column;gap:12px}
+
+    /* SALON BAŞLIK - Mağaza Profili */
+    .salon-header{
+      background:var(--card);
+      border-radius:20px;
+      overflow:hidden;
+      box-shadow:0 2px 8px rgba(0,0,0,.09);
+    }
+    /* Cover / banner alanı */
+    .salon-cover{
+      height:80px;
+      background:linear-gradient(135deg,#1a6ef5 0%,#06b6d4 100%);
+      position:relative;
+    }
+    .salon-cover-pattern{
+      position:absolute;inset:0;
+      background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.05) 0,rgba(255,255,255,.05) 1px,transparent 0,transparent 50%);
+      background-size:20px 20px;
+    }
+    .salon-cover img{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+      object-fit:cover;
+      border-radius:0;
+    }
+    .salon-cover-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to bottom, rgba(0,0,0,.15) 0%, rgba(0,0,0,.35) 100%);
+    }
+    /* Logo - cover üzerine taşıyor */
+    .salon-logo{
+      width:64px;height:64px;
+      border-radius:16px;
+      background:var(--accent-light);
+      display:flex;align-items:center;justify-content:center;
+      font-size:28px;
+      flex-shrink:0;
+      overflow:hidden;
+      border:3px solid #fff;
+      box-shadow:0 2px 8px rgba(0,0,0,.15);
+      position:absolute;
+      bottom:-24px;
+      left:18px;
+    }
+    .salon-logo img{width:100%;height:100%;object-fit:cover}
+    /* Profil içerik alanı */
+    .salon-profile{
+      padding:32px 16px 16px;
+      position:relative;
+    }
+    .salon-name-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .salon-meta h1{font-size:18px;font-weight:800;color:var(--text);line-height:1.2}
+    .salon-meta-row{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+    .salon-meta-row .owner{font-size:13px;color:var(--muted)}
+    .salon-meta-row .sep{font-size:11px;color:var(--border)}
+    .salon-meta-row .addr{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:2px}
+    /* Puan rozeti - cover sağ alt */
+    .salon-rating-badge{
+      position:absolute;
+      bottom:10px;
+      right:12px;
+      display:none;
+      align-items:center;gap:4px;
+      background:rgba(0,0,0,.55);
+      backdrop-filter:blur(6px);
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:20px;padding:5px 11px;
+      font-size:13px;font-weight:700;color:#fff;
+    }
+    .salon-rating-badge .star{color:#fbbf24;font-size:14px}
+    .salon-rating-badge .count{font-size:11px;color:rgba(255,255,255,.75);font-weight:500}
+    /* Aksiyon butonları */
+    .salon-actions{
+      display:flex;gap:8px;
+      margin-top:12px;
+    }
+    .action-btn{
+      flex:1;
+      display:flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 12px;
+      border-radius:12px;
+      font-size:13px;font-weight:700;
+      cursor:pointer;
+      border:none;
+      -webkit-tap-highlight-color:transparent;
+      transition:opacity .15s;
+    }
+    .action-btn:active{opacity:.75}
+    .action-btn.phone{
+      background:var(--green-light);color:var(--green);
+      border:1.5px solid #bbf7d0;
+      text-decoration:none;
+    }
+    .action-btn.share{
+      background:var(--accent-light);color:var(--accent);
+      border:1.5px solid #c7d9ff;
+    }
+
+    /* BANKA KARTI */
+    .bank-card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+
+    /* Banka başlık */
+    .bank-header{display:flex;align-items:center;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px}
+    .bank-avatar{width:38px;height:38px;border-radius:10px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--accent);flex-shrink:0}
+    .bank-header h3{font-size:15px;font-weight:800;color:var(--text)}
+    .bank-header p{font-size:12px;color:var(--muted)}
+
+    /* Bilgi satırı - alıcı ve IBAN için ortak */
+    .info-row{background:var(--accent-light);border:1.5px solid #c7d9ff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+    .info-row:last-of-type{margin-bottom:16px}
+    .info-icon{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0}
+    .info-icon.iban-icon{border-radius:9px;font-size:11px;font-weight:800;letter-spacing:-.5px}
+    .info-content{flex:1;min-width:0}
+    .info-label{font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+    .info-value{font-size:15px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .info-value.mono{font-family:'Courier New',monospace;font-size:14px;letter-spacing:.5px;white-space:normal;word-break:break-all;line-height:1.4}
+    .copy-mini{background:#fff;border:1.5px solid var(--accent);color:var(--accent);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;-webkit-tap-highlight-color:transparent}
+    .copy-mini:active{background:var(--accent);color:#fff;transform:scale(.96)}
+    .copy-mini.ok{background:var(--green);border-color:var(--green);color:#fff}
+
+    /* Kopyalandı mesajı */
+    .next-step{display:none;background:var(--green-light);border:1.5px solid #bbf7d0;border-radius:14px;padding:13px 16px;font-size:13px;color:var(--green);font-weight:600;text-align:center;line-height:1.6;margin-bottom:2px}
+    .next-step.show{display:block}
+    .next-step span{display:block;font-size:12px;color:#4ade80;font-weight:400;margin-top:3px}
+
+    /* HİZMET TARİFESİ */
+    .services-card{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .services-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;font-size:15px;font-weight:700;color:var(--text);-webkit-tap-highlight-color:transparent;user-select:none}
+    .services-toggle:active{background:rgba(0,0,0,.03)}
+    .toggle-arrow{font-size:12px;color:var(--muted);transition:transform .25s}
+    .toggle-arrow.open{transform:rotate(180deg)}
+    .services-body{padding:0 18px 14px}
+    .card-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+    .service-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+    .service-row:last-child{border-bottom:none;padding-bottom:0}
+    .service-name{font-size:14px;color:var(--text)}
+    .service-price{font-size:15px;font-weight:800;color:var(--accent)}
+
+    /* ADIMLAR */
+    .steps-card{background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .step{display:flex;align-items:center;gap:12px;padding:8px 0}
+    .step+.step{border-top:1px solid var(--border)}
+    .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+    .step-text{font-size:13px;color:var(--muted);line-height:1.4}
+    .step-text strong{color:var(--text)}
+
+    /* PUAN & YORUM */
+    .rating-card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .stars-row{display:flex;justify-content:center;gap:10px;margin:14px 0 10px}
+    .star-btn{font-size:36px;cursor:pointer;transition:transform .15s;background:none;border:none;padding:0;line-height:1;-webkit-tap-highlight-color:transparent;filter:grayscale(1);opacity:.4}
+    .star-btn.active{filter:none;opacity:1;transform:scale(1.15)}
+    .star-btn:active{transform:scale(.9)}
+    .rating-hint{text-align:center;font-size:13px;color:var(--muted);margin-bottom:14px;min-height:18px}
+    .review-input{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s}
+    .review-input:focus{border-color:var(--accent);background:#fff}
+    .review-name-row{display:flex;gap:8px;margin-top:8px}
+    .review-name-input{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s}
+    .review-name-input:focus{border-color:var(--accent);background:#fff}
+    .submit-review-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+    .submit-review-btn:disabled{opacity:.5;cursor:not-allowed}
+    .submit-review-btn:active:not(:disabled){opacity:.8}
+    .review-thanks{display:none;text-align:center;padding:10px 0;color:var(--green);font-weight:700;font-size:15px}
+    /* Yorumlar listesi */
+    .reviews-section{background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+    .avg-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+    .avg-score{font-size:40px;font-weight:900;color:var(--text);line-height:1}
+    .avg-stars{font-size:20px;letter-spacing:2px}
+    .avg-count{font-size:13px;color:var(--muted);margin-top:2px}
+    .review-item{padding:12px 0;border-bottom:1px solid var(--border)}
+    .review-item:last-child{border-bottom:none;padding-bottom:0}
+    .review-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+    .review-author{font-size:13px;font-weight:700;color:var(--text)}
+    .review-stars{font-size:13px;letter-spacing:1px}
+    .review-date{font-size:11px;color:var(--muted)}
+    .review-text{font-size:13px;color:var(--muted);line-height:1.5;margin-top:3px}
+
+    /* POPUP REKLAM */
+    .ad-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;align-items:flex-end;justify-content:center;padding:0}
+    .ad-popup-overlay.show{display:flex}
+    .ad-popup-box{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:420px;padding:20px;animation:slideUp .35s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .ad-popup-close{position:absolute;top:14px;right:16px;background:rgba(0,0,0,.1);border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555}
+    .ad-popup-inner{border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none;margin-bottom:14px}
+    .ad-popup-icon{font-size:28px;flex-shrink:0}
+    .ad-popup-text strong{font-size:15px;color:#fff;display:block;line-height:1.3}
+    .ad-popup-text span{font-size:12px;color:rgba(255,255,255,.85)}
+    .ad-popup-cta{background:rgba(255,255,255,.25);border:1.5px solid rgba(255,255,255,.5);color:#fff;font-size:12px;font-weight:700;padding:7px 16px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-left:auto}
+    .ad-popup-skip{display:block;text-align:center;font-size:13px;color:var(--muted);cursor:pointer;padding:4px}
+
+    /* İçerik İçi Reklam */
+    .ad-inline{margin:0;background:#fff;border-radius:20px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,.07);display:none}
+    .ad-inline .ad-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+    .ad-inline .ad-inner{border-radius:12px;padding:12px 14px}
+
+    /* FOOTER */
+    .footer{text-align:center;padding:12px;border-top:1px solid var(--border);background:#fff}
+    .footer a{font-size:12px;color:var(--muted);text-decoration:none}
+    .footer span{color:var(--accent);font-weight:700}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#111;color:#fff;padding:11px 22px;border-radius:50px;font-size:14px;font-weight:600;transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+    .toast.show{transform:translateX(-50%) translateY(0)}
+
+    .error-page{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);padding:40px}
+    .error-page .icon{font-size:48px}
+  </style>
+</head>
+<body>
+
+  <!-- REKLAM -->
+  <div class="ad-bar">
+    <div class="ad-label">Sponsorlu</div>
+    <a class="ad-inner" href="#" id="adLink">
+      <div class="ad-icon">✂️</div>
+      <div class="ad-text">
+        <strong>Saç Bakım Ürünleri %30 İndirimde</strong>
+        <span>Profesyonel salon ürünleri kapınıza gelsin</span>
+      </div>
+      <div class="ad-cta">İncele</div>
+    </a>
+  </div>
+
+  <div class="container" id="mainContent" style="display:none">
+
+    <!-- Salon Başlık - Mağaza Profili -->
+    <div class="salon-header">
+      <!-- Cover Banner -->
+      <div class="salon-cover" id="salonCover">
+        <div class="salon-cover-pattern" id="coverPattern"></div>
+        <div class="salon-cover-overlay" id="coverOverlay" style="display:none"></div>
+        <!-- Puan Rozeti - cover sağ alt -->
+        <div class="salon-rating-badge" id="salonRatingBadge">
+          <span class="star">⭐</span>
+          <span id="salonRatingVal">0.0</span>
+          <span class="count" id="salonRatingCount">(0)</span>
+        </div>
+        <!-- Logo cover üzerine taşıyor -->
+        <div class="salon-logo" id="salonLogo">✂️</div>
+      </div>
+      <!-- Profil İçerik -->
+      <div class="salon-profile">
+        <div class="salon-name-row">
+          <div class="salon-meta">
+            <h1 id="salonName">Yükleniyor...</h1>
+            <div class="salon-meta-row">
+              <span class="owner" id="salonOwner"></span>
+              <span class="sep" id="salonSep" style="display:none">•</span>
+              <span class="addr" id="salonAddr"></span>
+            </div>
+          </div>
+        </div>
+        <!-- Aksiyon Butonları -->
+        <div class="salon-actions">
+          <a class="action-btn phone" id="phoneBtn" href="#" style="display:none">
+            📞 <span id="phoneLabel">Ara</span>
+          </a>
+          <button class="action-btn share" onclick="shareSalon()">
+            🔗 Paylaş
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hizmet Tarifesi (Açılır/Kapanır) -->
+    <div class="services-card" id="servicesCard" style="display:none">
+      <div class="services-toggle" onclick="toggleServices()">
+        <span>💈 Hizmet Tarifesi</span>
+        <span class="toggle-arrow" id="servicesArrow">▼</span>
+      </div>
+      <div class="services-body" id="servicesBody" style="display:none">
+        <div id="servicesList"></div>
+      </div>
+    </div>
+
+    <!-- Banka Kartı -->
+    <div class="bank-card">
+      <div class="bank-header">
+        <div class="bank-avatar" id="bankAvatar">B</div>
+        <div>
+          <h3 id="bankName">Banka</h3>
+          <p>Hesap Bilgileri</p>
+        </div>
+      </div>
+
+      <!-- Alıcı Adı -->
+      <div class="info-row">
+        <div class="info-icon" id="receiverInitial">MA</div>
+        <div class="info-content">
+          <div class="info-label">Alıcı Adı</div>
+          <div class="info-value" id="receiverName">Yükleniyor...</div>
+        </div>
+        <button class="copy-mini" id="copyNameBtn" onclick="copyName()">Kopyala</button>
+      </div>
+
+      <!-- IBAN -->
+      <div class="info-row">
+        <div class="info-icon iban-icon">IBAN</div>
+        <div class="info-content">
+          <div class="info-label">IBAN Numarası</div>
+          <div class="info-value mono" id="ibanDisplay">TR00 0000 0000 0000 0000 0000 00</div>
+        </div>
+        <button class="copy-mini" id="copyIbanBtn" onclick="copyIBAN()">Kopyala</button>
+      </div>
+
+      <!-- Kopyalandı mesajı -->
+      <div class="next-step" id="nextStep">
+        ✅ IBAN kopyalandı!
+        <span>Banka uygulamanı aç → EFT / Havale → Yapıştır → Tutarı gir → Gönder</span>
+      </div>
+    </div>
+
+    <!-- İçerik İçi Reklam (inline) -->
+    <div class="ad-inline" id="adInline">
+      <div class="ad-label">Sponsorlu</div>
+      <a class="ad-inner" href="#" id="adInlineLink">
+        <div class="ad-icon" id="adInlineIcon">📢</div>
+        <div class="ad-text">
+          <strong id="adInlineTitle">Reklam Alanı</strong>
+          <span id="adInlineSubtitle"></span>
+        </div>
+        <div class="ad-cta">Gör</div>
+      </a>
+    </div>
+
+    <!-- Adımlar -->
+    <div class="steps-card">
+      <div class="card-title">💡 Nasıl Ödeme Yapılır?</div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Alıcı adını</strong> kopyala, banka uygulamanı aç</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>EFT / Havale</strong> ekranında alıcı adını yapıştır</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>IBAN'ı</strong> kopyala ve IBAN alanına yapıştır</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Tutarı gir</strong> ve gönder ✅</div></div>
+    </div>
+
+    <!-- Puan & Yorum Ver -->
+    <div class="rating-card" id="ratingCard">
+      <div class="card-title">⭐ Bu Salonu Puanla</div>
+      <div id="ratingForm">
+        <div class="stars-row" id="starsRow">
+          <button class="star-btn" data-v="1" onclick="setStar(1)">⭐</button>
+          <button class="star-btn" data-v="2" onclick="setStar(2)">⭐</button>
+          <button class="star-btn" data-v="3" onclick="setStar(3)">⭐</button>
+          <button class="star-btn" data-v="4" onclick="setStar(4)">⭐</button>
+          <button class="star-btn" data-v="5" onclick="setStar(5)">⭐</button>
+        </div>
+        <div class="rating-hint" id="ratingHint">Puan vermek için yıldıza dokun</div>
+        <textarea class="review-input" id="reviewComment" rows="3" placeholder="Yorum yaz (isteğe bağlı)..."></textarea>
+        <div class="review-name-row">
+          <input class="review-name-input" id="reviewName" type="text" placeholder="Adın (isteğe bağlı)" maxlength="40"/>
+          <button class="submit-review-btn" id="submitReviewBtn" onclick="submitReview()" disabled>Gönder</button>
+        </div>
+      </div>
+      <div class="review-thanks" id="reviewThanks">🎉 Teşekkürler! Yorumun kaydedildi.</div>
+    </div>
+
+    <!-- Yorumlar -->
+    <div class="reviews-section" id="reviewsSection" style="display:none">
+      <div class="card-title">💬 Müşteri Yorumları</div>
+      <div class="avg-row" id="avgRow"></div>
+      <div id="reviewsList"></div>
+    </div>
+
+  </div>
+
+  <div class="error-page" id="errorPage" style="display:none">
+    <div class="icon">❌</div>
+    <p>Salon bulunamadı.</p>
+  </div>
+
+  <!-- POPUP REKLAM -->
+  <div class="ad-popup-overlay" id="adPopupOverlay" onclick="closePopupAd(event)">
+    <div class="ad-popup-box" style="position:relative">
+      <button class="ad-popup-close" onclick="closePopupAd()">&#x2715;</button>
+      <a class="ad-popup-inner" href="#" id="adPopupLink">
+        <div class="ad-popup-icon" id="adPopupIcon">📢</div>
+        <div class="ad-popup-text">
+          <strong id="adPopupTitle">Reklam</strong>
+          <span id="adPopupSubtitle"></span>
+        </div>
+        <div class="ad-popup-cta">Gör</div>
+      </a>
+      <span class="ad-popup-skip" onclick="closePopupAd()">Kapat &times;</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <a href="/admin">Powered by <span>Çabuk</span></a>
+  </div>
+
+  <div class="toast" id="toast">✅ Kopyalandı!</div>
+
+<script>
+const slug = location.pathname.split('/salon/')[1];
+
+async function loadSalon(){
+  try{
+    const res = await fetch(`/api/salons/${slug}`);
+    if(!res.ok) throw new Error('not found');
+    const s = await res.json();
+
+    fetch(`/api/visit/${slug}`,{method:'POST'});
+
+    document.getElementById('salonName').textContent  = s.name;
+    document.getElementById('salonOwner').textContent = s.ownerName;
+    if(s.address){
+      document.getElementById('salonAddr').textContent = '📍 '+s.address;
+      document.getElementById('salonSep').style.display = 'inline';
+    }
+    if(s.logoUrl){
+      document.getElementById('salonLogo').innerHTML = `<img src="${s.logoUrl}" alt=""/>`;
+    }
+    // Cover görseli
+    if(s.coverUrl){
+      const cover = document.getElementById('salonCover');
+      const img = document.createElement('img');
+      img.src = s.coverUrl;
+      img.alt = '';
+      cover.insertBefore(img, cover.firstChild);
+      document.getElementById('coverPattern').style.display = 'none';
+      document.getElementById('coverOverlay').style.display = 'block';
+    }
+    // Telefon butonu
+    if(s.phone){
+      const pb = document.getElementById('phoneBtn');
+      pb.href = 'tel:'+s.phone.replace(/\s/g,'');
+      document.getElementById('phoneLabel').textContent = s.phone;
+      pb.style.display = 'flex';
+    }
+    // Puan rozeti - yorumlardan çek
+    loadRatingBadge();
+
+    document.getElementById('bankName').textContent = s.bank;
+    document.getElementById('bankAvatar').textContent = s.bank.charAt(0).toUpperCase();
+
+    document.getElementById('receiverName').textContent = s.ownerName;
+    const initials = s.ownerName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('receiverInitial').textContent = initials;
+
+    const fmt = s.iban.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s.iban;
+    document.getElementById('ibanDisplay').textContent = fmt;
+
+    if(s.services && s.services.length){
+      const list = document.getElementById('servicesList');
+      list.innerHTML = s.services.map(sv=>`
+        <div class="service-row">
+          <span class="service-name">${sv.name}</span>
+          <span class="service-price">₺${sv.price}</span>
+        </div>`).join('');
+      document.getElementById('servicesCard').style.display='block';
+    }
+
+    document.getElementById('mainContent').style.display='flex';
+    document.title = s.name + ' — Çabuk';
+  } catch(e){
+    document.getElementById('errorPage').style.display='flex';
+  }
+}
+
+// Puan rozetini yükle
+async function loadRatingBadge(){
+  try{
+    const res = await fetch(`/api/reviews/${slug}`);
+    const data = await res.json();
+    if(data && data.total > 0){
+      document.getElementById('salonRatingVal').textContent = data.avg.toFixed(1);
+      document.getElementById('salonRatingCount').textContent = `(${data.total})`;
+      document.getElementById('salonRatingBadge').style.display = 'flex';
+    }
+  }catch(e){}
+}
+
+// Paylaş fonksiyonu
+async function shareSalon(){
+  const name = document.getElementById('salonName').textContent;
+  const url  = location.href;
+  if(navigator.share){
+    try{
+      await navigator.share({ title: name, text: name+' ödeme sayfası', url });
+      return;
+    }catch(e){}
+  }
+  // Fallback: URL kopyala
+  const btn = document.querySelector('.action-btn.share');
+  if(navigator.clipboard){
+    await navigator.clipboard.writeText(url);
+  } else {
+    const el=document.createElement('textarea');
+    el.value=url;el.style.position='fixed';el.style.opacity='0';
+    document.body.appendChild(el);el.focus();el.select();
+    document.execCommand('copy');document.body.removeChild(el);
+  }
+  btn.textContent = '✅ Link kopyalandı!';
+  setTimeout(()=>{ btn.innerHTML = '🔗 Paylaş'; },2500);
+  showToast('🔗 Sayfa linki kopyalandı!');
+}
+
+function copyName(){
+  const name = document.getElementById('receiverName').textContent;
+  const btn = document.getElementById('copyNameBtn');
+  doCopy(name, btn, '✅ Alıcı adı kopyalandı!');
+}
+
+function copyIBAN(){
+  const iban = document.getElementById('ibanDisplay').textContent.replace(/\s/g,'');
+  const btn = document.getElementById('copyIbanBtn');
+  doCopy(iban, btn, '✅ IBAN kopyalandı!', true);
+}
+
+function doCopy(text, btn, toastMsg, showNext=false){
+  const doAfter = () => {
+    btn.classList.add('ok');
+    btn.textContent = '✅';
+    showToast(toastMsg);
+    if(showNext) document.getElementById('nextStep').classList.add('show');
+    setTimeout(()=>{ btn.classList.remove('ok'); btn.textContent='Kopyala'; },3000);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(doAfter).catch(()=>fallback(text,doAfter));
+  } else { fallback(text,doAfter); }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function fallback(text,cb){
+  const el=document.createElement('textarea');
+  el.value=text; el.style.position='fixed'; el.style.opacity='0';
+  document.body.appendChild(el); el.focus(); el.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(el); cb();
+}
+
+// ── YORUM FONKSİYONLARI ──
+let selectedRating = 0;
+const HINTS = ['','Kötü 😞','Fena değil 😐','İyi 🙂','Harika 😄','Mükemmel 🤩'];
+
+function toggleServices(){
+  const body = document.getElementById('servicesBody');
+  const arrow = document.getElementById('servicesArrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.classList.toggle('open', !isOpen);
+}
+
+function setStar(val){
+  selectedRating = val;
+  document.querySelectorAll('.star-btn').forEach(b=>{
+    const v = parseInt(b.dataset.v);
+    b.classList.toggle('active', v <= val);
+  });
+  document.getElementById('ratingHint').textContent = HINTS[val];
+  document.getElementById('submitReviewBtn').disabled = false;
+}
+
+async function submitReview(){
+  if(!selectedRating) return;
+  const btn = document.getElementById('submitReviewBtn');
+  btn.disabled = true;
+  btn.textContent = 'Gönderiliyor...';
+  try{
+    const res = await fetch(`/api/reviews/${slug}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        rating: selectedRating,
+        comment: document.getElementById('reviewComment').value,
+        name: document.getElementById('reviewName').value || 'Anonim',
+      })
+    });
+    if(!res.ok) throw new Error();
+    document.getElementById('ratingForm').style.display='none';
+    document.getElementById('reviewThanks').style.display='block';
+    loadReviews();
+  } catch(e){
+    btn.disabled = false;
+    btn.textContent = 'Gönder';
+    showToast('❌ Bir hata oluştu, tekrar dene.');
+  }
+}
+
+async function loadReviews(){
+  try{
+    const res = await fetch(`/api/reviews/${slug}`);
+    const data = await res.json();
+    if(!data.total) return;
+    const sec = document.getElementById('reviewsSection');
+    sec.style.display='block';
+    // Ortalama
+    const stars = '⭐'.repeat(Math.round(data.avg||0));
+    document.getElementById('avgRow').innerHTML = `
+      <div class="avg-score">${data.avg}</div>
+      <div>
+        <div class="avg-stars">${stars}</div>
+        <div class="avg-count">${data.total} değerlendirme</div>
+      </div>`;
+    // Liste
+    document.getElementById('reviewsList').innerHTML = data.reviews.map(r=>{
+      const d = new Date(r.ts);
+      const dateStr = d.toLocaleDateString('tr-TR',{day:'numeric',month:'short',year:'numeric'});
+      const stars = '⭐'.repeat(r.rating);
+      return `<div class="review-item">
+        <div class="review-header">
+          <span class="review-author">${r.name}</span>
+          <span class="review-stars">${stars}</span>
+        </div>
+        <div class="review-date">${dateStr}</div>
+        ${r.comment ? `<div class="review-text">${r.comment}</div>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e){}
+}
+
+// ── Reklam yükleme ─────────────────────────────────────────────────────────────────
+async function loadAds(){
+  try{
+    const res = await fetch('/api/ads/active');
+    const ads = await res.json();
+    if(!ads.length) return;
+
+    const bannerAds = ads.filter(a => a.type === 'banner');
+    const inlineAds = ads.filter(a => a.type === 'inline');
+    const popupAds  = ads.filter(a => a.type === 'popup');
+
+    // Banner (sayfa üstü) - ilk banner reklamı
+    if(bannerAds.length){
+      const ad = bannerAds[0];
+      const link = document.getElementById('adLink');
+      link.href = ad.link || '#';
+      link.style.background = `linear-gradient(135deg, ${ad.bgColor||'#1a6ef5'}, ${adjustColor(ad.bgColor||'#1a6ef5')})`;
+      link.querySelector('strong').textContent = ad.title;
+      link.querySelector('span').textContent   = ad.subtitle || '';
+      link.querySelector('.ad-icon').textContent = ad.imageUrl ? '' : '📢';
+      if(ad.imageUrl) link.querySelector('.ad-icon').innerHTML = `<img src="${ad.imageUrl}" style="width:28px;height:28px;object-fit:cover;border-radius:6px"/>`;
+      if(ad.link) link.onclick = () => fetch(`/api/ads/${ad._id}/click`,{method:'POST'});
+      fetch(`/api/ads/${ad._id}/view`,{method:'POST'});
+    }
+
+    // Inline (içerik içi) - adimlardan önce
+    if(inlineAds.length){
+      const ad = inlineAds[0];
+      const box = document.getElementById('adInline');
+      const link = document.getElementById('adInlineLink');
+      box.style.display = 'block';
+      link.href = ad.link || '#';
+      link.style.background = `linear-gradient(135deg, ${ad.bgColor||'#7c3aed'}, ${adjustColor(ad.bgColor||'#7c3aed')})`;
+      document.getElementById('adInlineTitle').textContent    = ad.title;
+      document.getElementById('adInlineSubtitle').textContent = ad.subtitle || '';
+      document.getElementById('adInlineIcon').textContent     = '📢';
+      if(ad.imageUrl) document.getElementById('adInlineIcon').innerHTML = `<img src="${ad.imageUrl}" style="width:28px;height:28px;object-fit:cover;border-radius:6px"/>`;
+      if(ad.link) link.onclick = () => fetch(`/api/ads/${ad._id}/click`,{method:'POST'});
+      fetch(`/api/ads/${ad._id}/view`,{method:'POST'});
+    }
+
+    // Popup - 3 saniye sonra göster
+    if(popupAds.length){
+      const ad = popupAds[0];
+      setTimeout(() => {
+        const overlay = document.getElementById('adPopupOverlay');
+        const link    = document.getElementById('adPopupLink');
+        overlay.classList.add('show');
+        link.href = ad.link || '#';
+        link.style.background = `linear-gradient(135deg, ${ad.bgColor||'#e94560'}, ${adjustColor(ad.bgColor||'#e94560')})`;
+        document.getElementById('adPopupTitle').textContent    = ad.title;
+        document.getElementById('adPopupSubtitle').textContent = ad.subtitle || '';
+        document.getElementById('adPopupIcon').textContent     = '📢';
+        if(ad.imageUrl) document.getElementById('adPopupIcon').innerHTML = `<img src="${ad.imageUrl}" style="width:32px;height:32px;object-fit:cover;border-radius:8px"/>`;
+        if(ad.link) link.onclick = () => fetch(`/api/ads/${ad._id}/click`,{method:'POST'});
+        fetch(`/api/ads/${ad._id}/view`,{method:'POST'});
+      }, 3000);
+    }
+  } catch(e){}
+}
+
+function closePopupAd(e){
+  if(e && e.target !== document.getElementById('adPopupOverlay')) return;
+  document.getElementById('adPopupOverlay').classList.remove('show');
+}
+
+// Rengi biraz koyulaştır (gradient ikinci renk)
+function adjustColor(hex){
+  try{
+    const n = parseInt(hex.replace('#',''),16);
+    const r = Math.max(0,((n>>16)&0xff)-40);
+    const g = Math.max(0,((n>>8)&0xff)-40);
+    const b = Math.max(0,(n&0xff)-40);
+    return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+  } catch(e){ return hex; }
+}
+
+loadSalon();
+loadReviews();
+loadAds();
+</script>
+</body>
+</html>
