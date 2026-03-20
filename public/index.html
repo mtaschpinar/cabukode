@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Çabuk Öde – Berberler ve Kuaförler İçin Dijital Ödeme Kartı</title>
-  <meta name="description" content="QR kod ile müşterileriniz IBAN'ınıza anında ödeme yapsın. Berber, kuaför ve küçük işletmeler için ücretsiz dijital kartvizit." />
+  <title>Çabuk Öde – Esnaflar İçin Ücretsiz Sanal Kartvizit ve Mini Site</title>
+  <meta name="description" content="Berber, galeri, telefon tamircisi, fırın — her esnaf için ücretsiz dijital kartvizit. cabukode.com/firmaniz adresinde hizmetleriniz, iletişim bilgileriniz ve daha fazlası." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -12,10 +12,11 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand:       #0ea5e9;
-      --brand-dark:  #0284c7;
-      --brand-light: #e0f2fe;
+      --brand:       #6366f1;
+      --brand-dark:  #4f46e5;
+      --brand-light: #eef2ff;
       --accent:      #f59e0b;
+      --green:       #10b981;
       --dark:        #0f172a;
       --dark2:       #1e293b;
       --muted:       #64748b;
@@ -38,16 +39,16 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 5vw;
-      height: 64px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(12px);
+      padding: 0 5vw; height: 64px;
+      background: rgba(255,255,255,0.93);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
       transition: box-shadow .3s;
     }
     .nav-logo {
-      font-size: 1.25rem; font-weight: 900; color: var(--brand);
+      font-size: 1.25rem; font-weight: 900;
       text-decoration: none; letter-spacing: -0.5px;
+      color: var(--brand);
     }
     .nav-logo span { color: var(--dark); }
     .nav-links { display: flex; gap: 28px; list-style: none; }
@@ -68,36 +69,54 @@
       min-height: 100vh;
       display: flex; align-items: center;
       padding: 100px 5vw 60px;
-      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 40%, #fef9ee 100%);
+      background: linear-gradient(135deg, #f5f3ff 0%, #eef2ff 45%, #fefce8 100%);
       position: relative; overflow: hidden;
     }
     .hero::before {
       content: '';
-      position: absolute; top: -120px; right: -120px;
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(14,165,233,.15) 0%, transparent 70%);
+      position: absolute; top: -100px; right: -100px;
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(99,102,241,.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -80px;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(245,158,11,.1) 0%, transparent 70%);
       pointer-events: none;
     }
     .hero-inner {
       max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+      position: relative; z-index: 1;
     }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--brand-light); color: var(--brand-dark);
-      padding: 6px 14px; border-radius: 100px;
-      font-size: .8rem; font-weight: 600; margin-bottom: 20px;
+      padding: 6px 16px; border-radius: 100px;
+      font-size: .8rem; font-weight: 700; margin-bottom: 22px;
+      border: 1px solid rgba(99,102,241,.2);
     }
     h1 {
-      font-size: clamp(2rem, 4vw, 3.2rem);
-      font-weight: 900; line-height: 1.15;
-      letter-spacing: -1px; color: var(--dark);
-      margin-bottom: 20px;
+      font-size: clamp(2rem, 4vw, 3.3rem);
+      font-weight: 900; line-height: 1.12;
+      letter-spacing: -1.5px; color: var(--dark);
+      margin-bottom: 22px;
     }
     h1 em { font-style: normal; color: var(--brand); }
+    h1 .highlight {
+      position: relative; display: inline-block;
+    }
+    h1 .highlight::after {
+      content: '';
+      position: absolute; bottom: 2px; left: 0; right: 0; height: 6px;
+      background: rgba(245,158,11,.35);
+      border-radius: 3px; z-index: -1;
+    }
     .hero-sub {
       font-size: 1.1rem; color: var(--muted); max-width: 480px;
-      margin-bottom: 36px; line-height: 1.7;
+      margin-bottom: 36px; line-height: 1.75;
     }
     .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
     .btn-primary {
@@ -106,9 +125,9 @@
       padding: 14px 28px; border-radius: 10px;
       font-size: 1rem; font-weight: 700; text-decoration: none;
       transition: background .2s, transform .15s, box-shadow .2s;
-      box-shadow: 0 4px 20px rgba(14,165,233,.35);
+      box-shadow: 0 4px 20px rgba(99,102,241,.35);
     }
-    .btn-primary:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(14,165,233,.4); }
+    .btn-primary:hover { background: var(--brand-dark); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(99,102,241,.4); }
     .btn-secondary {
       display: inline-flex; align-items: center; gap: 8px;
       background: #fff; color: var(--dark);
@@ -119,17 +138,29 @@
     }
     .btn-secondary:hover { border-color: var(--brand); color: var(--brand); transform: translateY(-2px); }
 
-    /* Hero mockup */
+    /* Hero URL bar */
+    .hero-url-bar {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #fff; border: 1.5px solid var(--border);
+      border-radius: 10px; padding: 10px 16px;
+      font-size: .875rem; color: var(--muted);
+      margin-top: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .hero-url-bar .url-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    .hero-url-bar strong { color: var(--brand); }
+
+    /* ── PHONE MOCKUP ── */
     .hero-visual { position: relative; display: flex; justify-content: center; }
     .phone-wrap {
-      position: relative; width: 280px;
+      position: relative; width: 270px;
       filter: drop-shadow(0 30px 60px rgba(0,0,0,.18));
     }
     .phone-frame {
-      background: var(--dark);
+      background: #1e1b4b;
       border-radius: 36px;
       padding: 14px 10px;
-      border: 3px solid #1e293b;
+      border: 3px solid #312e81;
     }
     .phone-screen {
       background: #fff;
@@ -138,42 +169,50 @@
       aspect-ratio: 9/19;
       display: flex; flex-direction: column;
     }
-    .ps-header {
-      background: linear-gradient(135deg, #0ea5e9, #0284c7);
-      padding: 20px 16px 16px;
-      text-align: center;
+    /* Cover */
+    .ps-cover {
+      height: 72px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      position: relative;
     }
-    .ps-avatar {
-      width: 60px; height: 60px; border-radius: 50%;
-      background: rgba(255,255,255,.25);
-      margin: 0 auto 10px;
+    .ps-cover-emoji {
+      position: absolute; bottom: -20px; left: 16px;
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #fff; border: 2px solid #e2e8f0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
     }
-    .ps-name { color: #fff; font-weight: 700; font-size: .95rem; }
-    .ps-sub  { color: rgba(255,255,255,.8); font-size: .72rem; margin-top: 2px; }
-    .ps-body { padding: 14px 12px; flex: 1; }
-    .ps-iban-box {
-      background: #f8fafc; border-radius: 10px;
-      padding: 10px 12px; margin-bottom: 10px;
-      border: 1.5px solid #e2e8f0;
+    .ps-header {
+      padding: 26px 14px 12px;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .ps-iban-label { font-size: .65rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
-    .ps-iban-num   { font-size: .72rem; color: #0f172a; font-weight: 600; margin: 3px 0; letter-spacing: .3px; }
-    .ps-copy-btn {
-      background: #0ea5e9; color: #fff;
-      border: none; border-radius: 7px;
-      padding: 8px; width: 100%; font-size: .72rem; font-weight: 600;
-      cursor: pointer; margin-top: 4px;
+    .ps-name { font-weight: 800; font-size: .9rem; color: #0f172a; }
+    .ps-slug { font-size: .65rem; color: #6366f1; font-weight: 600; margin-top: 1px; }
+    .ps-meta { font-size: .65rem; color: #94a3b8; margin-top: 4px; }
+    .ps-body { padding: 10px 12px; flex: 1; overflow: hidden; }
+    .ps-section-title { font-size: .6rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .ps-services { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+    .ps-service-tag {
+      background: #f1f5f9; color: #475569;
+      border-radius: 5px; padding: 3px 7px;
+      font-size: .58rem; font-weight: 600;
     }
-    .ps-staff { display: flex; gap: 8px; margin-top: 10px; }
-    .ps-staff-card {
-      flex: 1; background: #f8fafc; border-radius: 8px;
-      padding: 8px 6px; text-align: center; border: 1px solid #e2e8f0;
+    .ps-contact-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: .62rem; color: #475569; margin-bottom: 5px;
     }
-    .ps-staff-icon { font-size: 1.2rem; }
-    .ps-staff-name { font-size: .6rem; font-weight: 600; color: #334155; margin-top: 3px; }
-    .ps-staff-role { font-size: .55rem; color: #94a3b8; }
+    .ps-iban-mini {
+      background: #f8fafc; border-radius: 8px;
+      padding: 7px 10px; margin-top: 8px;
+      border: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ps-iban-mini span { font-size: .6rem; color: #64748b; }
+    .ps-iban-btn {
+      background: #6366f1; color: #fff;
+      border: none; border-radius: 5px;
+      padding: 3px 8px; font-size: .58rem; font-weight: 700; cursor: pointer;
+    }
 
     /* Floating badges */
     .float-badge {
@@ -186,25 +225,27 @@
       white-space: nowrap;
       animation: float 3s ease-in-out infinite;
     }
-    .float-badge.b1 { top: 20px; right: -30px; animation-delay: 0s; }
-    .float-badge.b2 { bottom: 60px; left: -40px; animation-delay: 1.5s; }
+    .float-badge.b1 { top: 30px; right: -35px; animation-delay: 0s; }
+    .float-badge.b2 { bottom: 80px; left: -45px; animation-delay: 1.5s; }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50%       { transform: translateY(-8px); }
     }
 
-    /* ── STATS BAR ── */
-    .stats-bar {
-      background: var(--dark);
-      padding: 32px 5vw;
+    /* ── WHO IS IT FOR ── */
+    .who { background: var(--dark); padding: 48px 5vw; }
+    .who-inner { max-width: 1100px; margin: 0 auto; }
+    .who-title { text-align: center; color: #94a3b8; font-size: .85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 28px; }
+    .who-grid {
+      display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
     }
-    .stats-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: flex; justify-content: space-around; flex-wrap: wrap; gap: 24px;
+    .who-tag {
+      background: rgba(255,255,255,.07); color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 100px; padding: 9px 18px;
+      font-size: .875rem; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
     }
-    .stat-item { text-align: center; }
-    .stat-num { font-size: 2rem; font-weight: 900; color: var(--brand); letter-spacing: -1px; }
-    .stat-label { font-size: .85rem; color: #94a3b8; margin-top: 4px; }
 
     /* ── SECTION COMMON ── */
     section { padding: 80px 5vw; }
@@ -223,7 +264,7 @@
     .section-sub { font-size: 1.05rem; color: var(--muted); max-width: 560px; line-height: 1.7; }
 
     /* ── HOW IT WORKS ── */
-    .how { background: #f8fafc; }
+    .how { background: #fafafa; }
     .how-inner { max-width: 1100px; margin: 0 auto; }
     .how-header { text-align: center; margin-bottom: 56px; }
     .how-header .section-sub { margin: 0 auto; }
@@ -236,6 +277,7 @@
       padding: 32px 24px;
       border: 1.5px solid var(--border);
       transition: transform .2s, box-shadow .2s;
+      position: relative;
     }
     .step-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
     .step-num {
@@ -247,6 +289,12 @@
     }
     .step-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
     .step-desc  { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+    .step-url {
+      display: inline-block; margin-top: 12px;
+      background: var(--brand-light); color: var(--brand-dark);
+      padding: 5px 12px; border-radius: 6px;
+      font-size: .78rem; font-weight: 700;
+    }
 
     /* ── FEATURES ── */
     .features-inner { max-width: 1100px; margin: 0 auto; }
@@ -262,56 +310,54 @@
       transition: transform .2s, box-shadow .2s;
     }
     .feat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.08); }
+    .feat-card.featured {
+      border-color: var(--brand);
+      background: linear-gradient(135deg, #fafafe, #fff);
+    }
     .feat-icon {
       width: 52px; height: 52px; border-radius: 14px;
       display: flex; align-items: center; justify-content: center;
       font-size: 1.5rem; margin-bottom: 16px;
     }
-    .feat-icon.blue   { background: #e0f2fe; }
-    .feat-icon.amber  { background: #fef3c7; }
-    .feat-icon.green  { background: #dcfce7; }
-    .feat-icon.purple { background: #f3e8ff; }
-    .feat-icon.rose   { background: #ffe4e6; }
-    .feat-icon.teal   { background: #ccfbf1; }
+    .feat-icon.indigo  { background: #eef2ff; }
+    .feat-icon.amber   { background: #fef3c7; }
+    .feat-icon.green   { background: #dcfce7; }
+    .feat-icon.purple  { background: #f3e8ff; }
+    .feat-icon.rose    { background: #ffe4e6; }
+    .feat-icon.sky     { background: #e0f2fe; }
+    .feat-icon.teal    { background: #ccfbf1; }
+    .feat-icon.orange  { background: #fff7ed; }
     .feat-title { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
     .feat-desc  { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+    .feat-badge {
+      display: inline-block; margin-top: 10px;
+      background: var(--brand-light); color: var(--brand-dark);
+      padding: 3px 10px; border-radius: 100px;
+      font-size: .72rem; font-weight: 700;
+    }
 
-    /* ── PAIN POINTS ── */
-    .pain { background: var(--dark); color: #fff; }
-    .pain-inner { max-width: 1100px; margin: 0 auto; }
-    .pain h2 { color: #fff; }
-    .pain .section-sub { color: #94a3b8; }
-    .pain-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
-      align-items: center; margin-top: 48px;
+    /* ── EXAMPLE SITES ── */
+    .examples { background: #fafafa; }
+    .examples-inner { max-width: 1100px; margin: 0 auto; }
+    .examples-header { text-align: center; margin-bottom: 48px; }
+    .examples-header .section-sub { margin: 0 auto; }
+    .examples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
     }
-    .pain-list { display: flex; flex-direction: column; gap: 20px; }
-    .pain-item {
-      display: flex; gap: 16px; align-items: flex-start;
-      background: rgba(255,255,255,.05); border-radius: 12px;
-      padding: 18px 20px; border: 1px solid rgba(255,255,255,.08);
+    .example-card {
+      background: #fff; border-radius: var(--radius);
+      padding: 24px 20px; text-align: center;
+      border: 1.5px solid var(--border);
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+      cursor: default;
     }
-    .pain-x { font-size: 1.3rem; flex-shrink: 0; }
-    .pain-item-title { font-size: .95rem; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
-    .pain-item-desc  { font-size: .82rem; color: #94a3b8; line-height: 1.5; }
-    .solution-box {
-      background: linear-gradient(135deg, #0ea5e9, #0284c7);
-      border-radius: 20px; padding: 36px 32px;
-      text-align: center;
-    }
-    .solution-box .sol-icon { font-size: 3rem; margin-bottom: 16px; }
-    .solution-box h3 { font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
-    .solution-box p  { color: rgba(255,255,255,.85); font-size: .9rem; line-height: 1.7; }
-    .solution-url {
-      display: inline-block; margin-top: 20px;
-      background: rgba(255,255,255,.15); color: #fff;
-      padding: 10px 20px; border-radius: 8px;
-      font-size: .85rem; font-weight: 700; letter-spacing: .3px;
-      border: 1px solid rgba(255,255,255,.25);
-    }
+    .example-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.08); border-color: var(--brand); }
+    .example-emoji { font-size: 2.2rem; margin-bottom: 12px; }
+    .example-type { font-size: .875rem; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .example-url { font-size: .72rem; color: var(--brand); font-weight: 600; }
 
     /* ── TESTIMONIALS ── */
-    .testimonials { background: #f8fafc; }
     .testimonials-inner { max-width: 1100px; margin: 0 auto; }
     .testimonials-header { text-align: center; margin-bottom: 48px; }
     .testimonials-header .section-sub { margin: 0 auto; }
@@ -334,11 +380,19 @@
 
     /* ── CTA ── */
     .cta-section {
-      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
       text-align: center; padding: 80px 5vw;
+      position: relative; overflow: hidden;
     }
-    .cta-section h2 { color: #fff; margin-bottom: 16px; }
-    .cta-section p  { color: rgba(255,255,255,.85); font-size: 1.05rem; max-width: 520px; margin: 0 auto 36px; line-height: 1.7; }
+    .cta-section::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,.07); border-radius: 50%;
+      pointer-events: none;
+    }
+    .cta-section h2 { color: #fff; margin-bottom: 16px; position: relative; }
+    .cta-section p  { color: rgba(255,255,255,.85); font-size: 1.05rem; max-width: 520px; margin: 0 auto 36px; line-height: 1.7; position: relative; }
     .btn-white {
       display: inline-flex; align-items: center; gap: 8px;
       background: #fff; color: var(--brand-dark);
@@ -346,9 +400,10 @@
       font-size: 1rem; font-weight: 700; text-decoration: none;
       transition: transform .15s, box-shadow .2s;
       box-shadow: 0 4px 20px rgba(0,0,0,.15);
+      position: relative;
     }
     .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,.2); }
-    .cta-note { margin-top: 18px; color: rgba(255,255,255,.7); font-size: .85rem; }
+    .cta-note { margin-top: 18px; color: rgba(255,255,255,.7); font-size: .85rem; position: relative; }
 
     /* ── FOOTER ── */
     footer {
@@ -381,11 +436,11 @@
       .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 40px; }
       .hero-sub { margin: 0 auto 32px; }
       .hero-actions { justify-content: center; }
+      .hero-url-bar { justify-content: center; }
       .hero-visual { order: -1; }
       .phone-wrap { width: 220px; }
-      .float-badge.b1 { right: -10px; top: 10px; font-size: .72rem; }
-      .float-badge.b2 { left: -10px; bottom: 40px; font-size: .72rem; }
-      .pain-grid { grid-template-columns: 1fr; }
+      .float-badge.b1 { right: -8px; top: 15px; font-size: .72rem; padding: 8px 10px; }
+      .float-badge.b2 { left: -8px; bottom: 50px; font-size: .72rem; padding: 8px 10px; }
       .footer-inner { flex-direction: column; }
     }
 
@@ -415,10 +470,10 @@
   <ul class="nav-links">
     <li><a href="#nasil-calisir">Nasıl Çalışır?</a></li>
     <li><a href="#ozellikler">Özellikler</a></li>
-    <li><a href="#yorumlar">Yorumlar</a></li>
+    <li><a href="#kimler">Kimler İçin?</a></li>
     <li><a href="/admin">Giriş Yap</a></li>
   </ul>
-  <a class="nav-cta" href="/admin">Ücretsiz Başla</a>
+  <a class="nav-cta" href="/admin">Ücretsiz Sitenizi Açın</a>
   <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Menü">
     <span></span><span></span><span></span>
   </button>
@@ -429,27 +484,28 @@
   <button class="mobile-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">&times;</button>
   <a href="#nasil-calisir" onclick="document.getElementById('mobileMenu').classList.remove('open')">Nasıl Çalışır?</a>
   <a href="#ozellikler" onclick="document.getElementById('mobileMenu').classList.remove('open')">Özellikler</a>
-  <a href="#yorumlar" onclick="document.getElementById('mobileMenu').classList.remove('open')">Yorumlar</a>
+  <a href="#kimler" onclick="document.getElementById('mobileMenu').classList.remove('open')">Kimler İçin?</a>
   <a href="/admin" onclick="document.getElementById('mobileMenu').classList.remove('open')">Giriş Yap</a>
-  <a href="/admin" onclick="document.getElementById('mobileMenu').classList.remove('open')" style="background:var(--brand);padding:12px 28px;border-radius:10px;font-size:1rem;">Ücretsiz Başla</a>
+  <a href="/admin" onclick="document.getElementById('mobileMenu').classList.remove('open')" style="background:var(--brand);padding:12px 28px;border-radius:10px;font-size:1rem;">Ücretsiz Sitenizi Açın</a>
 </div>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-content">
-      <div class="hero-badge">✂️ Berberler &amp; Kuaförler İçin</div>
-      <h1>IBAN paylaşma<br/>derdine <em>son verin</em></h1>
+      <div class="hero-badge">🆓 Tamamen Ücretsiz · Kurulum Gerektirmez</div>
+      <h1>İşletmenize<br/><em>ücretsiz</em> bir<br/><span class="highlight">dijital adres</span></h1>
       <p class="hero-sub">
-        QR kodunuzu kasaya asın, müşterileriniz telefonlarıyla okusun — IBAN'ınız anında kopyalansın, ödeme gelsin. Dijital kartvizitiniz hazır, üstelik ücretsiz.
+        Hizmetleriniz, iletişim bilgileriniz, çalışanlarınız ve ödeme bilgileriniz tek sayfada. Müşterileriniz sizi QR kodla veya linkle anında bulsun.
       </p>
       <div class="hero-actions">
-        <a href="/admin" class="btn-primary">
-          &#8594; Hemen Başla
-        </a>
-        <a href="#nasil-calisir" class="btn-secondary">
-          &#9654; Nasıl Çalışır?
-        </a>
+        <a href="/admin" class="btn-primary">Sanal Sitenizi Açın — Ücretsiz</a>
+        <a href="#nasil-calisir" class="btn-secondary">Nasıl Çalışır?</a>
+      </div>
+      <div class="hero-url-bar">
+        <span class="url-dot"></span>
+        cabukode.com/<strong>firmaniz</strong>
+        &nbsp;— siteniz hazır!
       </div>
     </div>
 
@@ -457,66 +513,59 @@
       <div class="phone-wrap">
         <div class="phone-frame">
           <div class="phone-screen">
+            <div class="ps-cover"></div>
+            <div class="ps-cover-emoji">🔧</div>
             <div class="ps-header">
-              <div class="ps-avatar">✂️</div>
-              <div class="ps-name">Ahmet Usta Berber</div>
-              <div class="ps-sub">cabukode.com/ahmetusta</div>
+              <div class="ps-name">Yılmaz Elektrik</div>
+              <div class="ps-slug">cabukode.com/yilmazelektrik</div>
+              <div class="ps-meta">📍 Kadıköy, İstanbul &nbsp;·&nbsp; ⭐ 4.8</div>
             </div>
             <div class="ps-body">
-              <div class="ps-iban-box">
-                <div class="ps-iban-label">Ödeme IBAN</div>
-                <div class="ps-iban-num">TR12 0001 0002 3456 7890 12</div>
-                <button class="ps-copy-btn">📋 IBAN'ı Kopyala</button>
+              <div class="ps-section-title">Hizmetler</div>
+              <div class="ps-services">
+                <span class="ps-service-tag">Elektrik Tesisatı</span>
+                <span class="ps-service-tag">Arıza Tespiti</span>
+                <span class="ps-service-tag">Kombi Bakımı</span>
+                <span class="ps-service-tag">7/24 Acil</span>
               </div>
-              <div class="ps-staff">
-                <div class="ps-staff-card">
-                  <div class="ps-staff-icon">💈</div>
-                  <div class="ps-staff-name">Ahmet Usta</div>
-                  <div class="ps-staff-role">Baş Berber</div>
-                </div>
-                <div class="ps-staff-card">
-                  <div class="ps-staff-icon">✂️</div>
-                  <div class="ps-staff-name">Mehmet</div>
-                  <div class="ps-staff-role">Berber</div>
-                </div>
-                <div class="ps-staff-card">
-                  <div class="ps-staff-icon">🪒</div>
-                  <div class="ps-staff-name">Ali</div>
-                  <div class="ps-staff-role">Berber</div>
-                </div>
+              <div class="ps-section-title">İletişim</div>
+              <div class="ps-contact-row">📞 0532 123 45 67</div>
+              <div class="ps-contact-row">💬 WhatsApp ile Yaz</div>
+              <div class="ps-iban-mini">
+                <span>IBAN ile Ödeme</span>
+                <button class="ps-iban-btn">Kopyala</button>
               </div>
             </div>
           </div>
         </div>
       </div>
       <div class="float-badge b1">
-        📲 QR ile anında ödeme
+        🔲 QR Kod Hazır
       </div>
       <div class="float-badge b2">
-        ⭐ Müşteri yorumları
+        ✅ 3 dk'da Yayında
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat-item">
-      <div class="stat-num">3 dk</div>
-      <div class="stat-label">Kurulum süresi</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">%100</div>
-      <div class="stat-label">Ücretsiz başlangıç</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">0 ₺</div>
-      <div class="stat-label">İşlem komisyonu</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-num">7/24</div>
-      <div class="stat-label">Erişilebilir dijital kart</div>
+<!-- WHO IS IT FOR -->
+<div class="who" id="kimler">
+  <div class="who-inner">
+    <div class="who-title">Her esnaf ve işletme için</div>
+    <div class="who-grid">
+      <div class="who-tag">✂️ Berber &amp; Kuaför</div>
+      <div class="who-tag">🚗 Oto Galeri</div>
+      <div class="who-tag">📱 Telefon Tamircisi</div>
+      <div class="who-tag">🍞 Fırın &amp; Pastane</div>
+      <div class="who-tag">🔧 Elektrikçi &amp; Tesisatçı</div>
+      <div class="who-tag">👗 Giyim Mağazası</div>
+      <div class="who-tag">🏥 Klinik &amp; Eczane</div>
+      <div class="who-tag">🍕 Restoran &amp; Kafe</div>
+      <div class="who-tag">🛒 Bakkal &amp; Market</div>
+      <div class="who-tag">🏠 Emlakçı</div>
+      <div class="who-tag">💇 Güzellik Salonu</div>
+      <div class="who-tag">+ Daha Fazlası</div>
     </div>
   </div>
 </div>
@@ -526,24 +575,25 @@
   <div class="how-inner">
     <div class="how-header">
       <div class="section-tag">Nasıl Çalışır?</div>
-      <h2>3 adımda dijital ödeme kartınız hazır</h2>
-      <p class="section-sub">Teknik bilgiye gerek yok. Birkaç dakika içinde müşterileriniz size QR kodla ödeme yapabilir.</p>
+      <h2>3 adımda sanal siteniz hazır</h2>
+      <p class="section-sub">Web sitesi yaptırmaya gerek yok, teknik bilgiye gerek yok. Dakikalar içinde işletmenizin dijital adresi yayında.</p>
     </div>
     <div class="steps">
       <div class="step-card">
         <div class="step-num">1</div>
-        <div class="step-title">İşletmenizi kaydedin</div>
-        <p class="step-desc">Salon adınızı, IBAN bilginizi ve logonuzu girin. Sistem otomatik olarak size özel bir sayfa adresi oluşturur: <strong>cabukode.com/salonunuz</strong></p>
+        <div class="step-title">Bilgilerinizi girin</div>
+        <p class="step-desc">İşletme adı, adres, telefon, hizmetler ve isteğe bağlı logo veya kapak fotoğrafı ekleyin. Sadece birkaç dakika sürer.</p>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
-        <div class="step-title">QR kodunuzu yazdırın</div>
-        <p class="step-desc">Otomatik oluşturulan QR kodunuzu indirin, kasanıza veya aynaya yapıştırın. Müşteriler telefonlarıyla tarayabilir.</p>
+        <div class="step-title">Adresiniz otomatik oluşur</div>
+        <p class="step-desc">Size özel bir adres ve QR kod anında hazırlanır. Müşterilerinizle paylaşın, WhatsApp'a veya Instagram'a ekleyin.</p>
+        <div class="step-url">cabukode.com/<em>firmaniz</em></div>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <div class="step-title">Ödemeler gelsin</div>
-        <p class="step-desc">Müşteri QR'ı okutunca IBAN'ınız tek tıkla kopyalanır. Bankacılık uygulamasına geçip ödemeyi tamamlar. Hızlı, kolay, komisyonsuz.</p>
+        <div class="step-title">Müşteriler sizi bulsun</div>
+        <p class="step-desc">QR kodu okutan veya linki açan müşteri hizmetlerinizi görür, sizi arar, WhatsApp'tan yazar ya da IBAN ile ödeme yapar.</p>
       </div>
     </div>
   </div>
@@ -554,103 +604,110 @@
   <div class="features-inner">
     <div class="features-header">
       <div class="section-tag">Özellikler</div>
-      <h2>İşletmeniz için ihtiyacınız olan her şey</h2>
-      <p class="section-sub">Sadece IBAN paylaşmakla kalmaz — tam bir dijital vitrin sunar.</p>
+      <h2>Bir mini site için ihtiyacınız olan her şey</h2>
+      <p class="section-sub">Pahalı web sitesi yaptırmadan işletmenizi dijitale taşıyın.</p>
     </div>
     <div class="features-grid">
-      <div class="feat-card">
-        <div class="feat-icon blue">📱</div>
-        <div class="feat-title">Kişisel Dijital Kartvizit</div>
-        <p class="feat-desc">cabukode.com/<strong>salonunuz</strong> adresinde profesyonel bir sayfa. Logo, adres, telefon, hizmetler — hepsi bir arada.</p>
+      <div class="feat-card featured">
+        <div class="feat-icon indigo">🌐</div>
+        <div class="feat-title">Kişisel Dijital Adres</div>
+        <p class="feat-desc">cabukode.com/<strong>firmaniz</strong> adresinde işletmenize özel sayfa. Logo, kapak görseli, adres, telefon — tam bir mini site.</p>
+        <span class="feat-badge">Ana Özellik</span>
       </div>
       <div class="feat-card">
-        <div class="feat-icon amber">🔲</div>
+        <div class="feat-icon amber">📋</div>
+        <div class="feat-title">Hizmet Listesi</div>
+        <p class="feat-desc">Sunduğunuz hizmetleri ve fiyatları listeleyin. Müşteriler sayfanıza girince ne yaptığınızı hemen anlasın.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon sky">🔲</div>
         <div class="feat-title">QR Kod Üretimi</div>
-        <p class="feat-desc">Salon sayfanıza yönlendiren yüksek çözünürlüklü QR kod otomatik oluşturulur. İndirin, yazdırın, asın.</p>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon green">💳</div>
-        <div class="feat-title">Tek Tıkla IBAN Kopyalama</div>
-        <p class="feat-desc">Müşteri sayfanızı açınca IBAN'ınızı tek tuşla kopyalar. Banka uygulamasına geçip ödemeyi tamamlar. Siz hiçbir şey yapmadan.</p>
+        <p class="feat-desc">Sayfanıza yönlendiren QR kod otomatik oluşturulur. Yazdırın, vitrine, kasaya veya kapıya yapıştırın.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon purple">👥</div>
-        <div class="feat-title">Personel Yönetimi</div>
-        <p class="feat-desc">Çalışanlarınızı ekleyin, fotoğraflarını ve unvanlarını gösterin. Müşteri kimi tercih ettiğini kolayca seçebilir.</p>
+        <div class="feat-title">Personel Tanıtımı</div>
+        <p class="feat-desc">Çalışanlarınızı fotoğraf ve unvanlarıyla tanıtın. Müşteri istediği kişiyle WhatsApp üzerinden iletişime geçebilir.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon green">💳</div>
+        <div class="feat-title">IBAN ile Ödeme Alma</div>
+        <p class="feat-desc">IBAN'ınızı sayfanıza ekleyin. Müşteri tek tıkla kopyalar, bankacılık uygulamasından ödemeyi tamamlar. Komisyon sıfır.</p>
       </div>
       <div class="feat-card">
         <div class="feat-icon rose">⭐</div>
         <div class="feat-title">Müşteri Yorumları</div>
-        <p class="feat-desc">Müşterileriniz puan ve yorum bırakabilir. Olumlu geri bildirimler yeni müşteri çekmenize yardımcı olur.</p>
+        <p class="feat-desc">Müşterileriniz puan ve yorum bırakabilir. Güvenilirliğinizi gösterin, yeni müşteri kazanın.</p>
       </div>
       <div class="feat-card">
-        <div class="feat-icon teal">📊</div>
+        <div class="feat-icon teal">📞</div>
+        <div class="feat-title">WhatsApp Entegrasyonu</div>
+        <p class="feat-desc">Sayfanızdan tek tuşla WhatsApp'a bağlantı. Müşteri randevu almak veya soru sormak için anında yazabilir.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon orange">📊</div>
         <div class="feat-title">Ziyaret İstatistikleri</div>
-        <p class="feat-desc">Sayfanızı kaç kişinin ziyaret ettiğini, hangi saatlerde yoğunluk olduğunu takip edin. Veriye dayalı kararlar alın.</p>
+        <p class="feat-desc">Sayfanızı kaç kişinin ziyaret ettiğini görün. Hangi saatlerde yoğunluk olduğunu takip edin.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PAIN POINTS -->
-<section class="pain">
-  <div class="pain-inner">
-    <div class="section-tag" style="background:rgba(14,165,233,.2);color:#38bdf8;">Neden Çabuk Öde?</div>
-    <h2>IBAN paylaşmanın eski yolları artık yetmiyor</h2>
-    <p class="section-sub">Her gün kaç kez aynı IBAN'ı tekrar tekrar söylüyorsunuz?</p>
-    <div class="pain-grid">
-      <div class="pain-list">
-        <div class="pain-item">
-          <span class="pain-x">😤</span>
-          <div>
-            <div class="pain-item-title">Sözlü IBAN aktarımı</div>
-            <p class="pain-item-desc">TR ile başlayan 26 haneli IBAN'ı her müşteriye tek tek söylemek zaman kaybı ve hata riski yaratır.</p>
-          </div>
-        </div>
-        <div class="pain-item">
-          <span class="pain-x">📝</span>
-          <div>
-            <div class="pain-item-title">Kağıda yazılı IBAN</div>
-            <p class="pain-item-desc">Kasaya yapıştırılan kağıt soluk, kirli veya kaybolmuş olabilir. Profesyonel görünüm zedelenir.</p>
-          </div>
-        </div>
-        <div class="pain-item">
-          <span class="pain-x">📲</span>
-          <div>
-            <div class="pain-item-title">WhatsApp'tan IBAN gönderme</div>
-            <p class="pain-item-desc">Her müşteriye mesaj atmak, müşterinin numarasını kaydetmek — gereksiz zaman kaybı.</p>
-          </div>
-        </div>
-        <div class="pain-item">
-          <span class="pain-x">💸</span>
-          <div>
-            <div class="pain-item-title">POS cihazı komisyonu</div>
-            <p class="pain-item-desc">Kart ödemelerinde %1-3 komisyon kesilir. IBAN transferi tamamen ücretsiz, komisyonsuz.</p>
-          </div>
-        </div>
+<!-- EXAMPLE SITES -->
+<section class="examples" id="ornekler">
+  <div class="examples-inner">
+    <div class="examples-header">
+      <div class="section-tag">Kimler Kullanıyor?</div>
+      <h2>Her işletme türü için hazır</h2>
+      <p class="section-sub">Berberden galeriye, fırından elektrikçiye — tüm esnaflar kendi dijital adresini oluşturabilir.</p>
+    </div>
+    <div class="examples-grid">
+      <div class="example-card">
+        <div class="example-emoji">✂️</div>
+        <div class="example-type">Berber &amp; Kuaför</div>
+        <div class="example-url">cabukode.com/ahmetberber</div>
       </div>
-      <div class="solution-box">
-        <div class="sol-icon">✨</div>
-        <h3>Çözüm: Dijital Ödeme Kartı</h3>
-        <p>QR kodunuzu kasanıza asın. Müşteri telefonunu tutup okutunca IBAN'ınız otomatik kopyalanır. Ödeme gelir, siz işinize bakarsınız.</p>
-        <div class="solution-url">cabukode.com/<em>salonunuz</em></div>
+      <div class="example-card">
+        <div class="example-emoji">🚗</div>
+        <div class="example-type">Oto Galeri</div>
+        <div class="example-url">cabukode.com/yilmazgaleri</div>
+      </div>
+      <div class="example-card">
+        <div class="example-emoji">📱</div>
+        <div class="example-type">Telefon Tamircisi</div>
+        <div class="example-url">cabukode.com/hizlitamir</div>
+      </div>
+      <div class="example-card">
+        <div class="example-emoji">🍞</div>
+        <div class="example-type">Fırın &amp; Pastane</div>
+        <div class="example-url">cabukode.com/ozfirin</div>
+      </div>
+      <div class="example-card">
+        <div class="example-emoji">🔧</div>
+        <div class="example-type">Elektrikçi</div>
+        <div class="example-url">cabukode.com/yilmazelektrik</div>
+      </div>
+      <div class="example-card">
+        <div class="example-emoji">💇</div>
+        <div class="example-type">Güzellik Salonu</div>
+        <div class="example-url">cabukode.com/guzelliksalonu</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
-<section class="testimonials" id="yorumlar">
+<section id="yorumlar">
   <div class="testimonials-inner">
     <div class="testimonials-header">
       <div class="section-tag">Kullanıcı Yorumları</div>
-      <h2>İşletme sahipleri ne diyor?</h2>
-      <p class="section-sub">Türkiye'nin dört bir yanından berber ve kuaförler Çabuk Öde'yi kullanıyor.</p>
+      <h2>Esnaflar ne diyor?</h2>
+      <p class="section-sub">Türkiye'nin dört bir yanından işletme sahipleri Çabuk Öde'yi kullanıyor.</p>
     </div>
     <div class="testi-grid">
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">"Artık her müşteriye IBAN söylemiyorum. QR'ı kasaya astım, herkes kendi okuyor. Çok pratik oldu."</p>
+        <p class="testi-text">"Web sitesi yaptırmak için para harcayacaktım. Çabuk Öde ile 5 dakikada kendi sayfam oldu. Müşterilerim artık linki paylaşıyorum."</p>
         <div class="testi-author">
           <div class="testi-avatar">M</div>
           <div>
@@ -661,7 +718,18 @@
       </div>
       <div class="testi-card">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">"Müşterilerim sayfamı açıyor, IBAN'ı kopyalıyor, ödüyor. Ben hiçbir şey yapmadan para geliyor. Harika!"</p>
+        <p class="testi-text">"Galeri sayfamı oluşturdum, araç listemi ekledim. Müşteriler QR kodu okutunca hizmetlerimizi görüyor. Çok işe yaradı."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">H</div>
+          <div>
+            <div class="testi-name">Hüseyin Çelik</div>
+            <div class="testi-role">Oto Galeri, Bursa</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"IBAN'ı artık söylemiyorum. Sayfamı açıyorlar, kopyalıyorlar, ödüyorlar. POS cihazı komisyonundan da kurtuldum."</p>
         <div class="testi-author">
           <div class="testi-avatar">F</div>
           <div>
@@ -670,28 +738,15 @@
           </div>
         </div>
       </div>
-      <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
-        <p class="testi-text">"POS cihazı komisyonundan kurtuldum. Müşterilerim de IBAN transferini tercih ediyor artık. Tavsiye ederim."</p>
-        <div class="testi-author">
-          <div class="testi-avatar">A</div>
-          <div>
-            <div class="testi-name">Ali Demir</div>
-            <div class="testi-role">Berber, İzmir</div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
 <!-- CTA -->
-<section class="cta-section" id="iletisim">
-  <h2>Dijital kartvizitinizi bugün oluşturun</h2>
-  <p>Ücretsiz, kurulumu kolay, komisyonsuz. 3 dakikada işletmeniz için özel QR ödeme sayfanız hazır.</p>
-  <a href="/admin" class="btn-white">
-    &#8594; Admin Paneline Git
-  </a>
+<section class="cta-section">
+  <h2>İşletmenizin dijital adresi hazır mı?</h2>
+  <p>Ücretsiz, hızlı ve kolay. 3 dakikada işletmenize özel sanal kartvizit sayfanız yayında.</p>
+  <a href="/admin" class="btn-white">Sanal Sitenizi Şimdi Açın →</a>
   <p class="cta-note">Zaten hesabınız var mı? <a href="/admin" style="color:#fff;font-weight:700;">Giriş yapın →</a></p>
 </section>
 
@@ -700,33 +755,32 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <a class="nav-logo" href="/"><span>Çabuk</span>Öde</a>
-      <p>Berberler, kuaförler ve küçük işletmeler için dijital ödeme kartı ve QR kod çözümü.</p>
+      <p>Tüm esnaf ve işletmeler için ücretsiz dijital kartvizit, mini site ve QR kod çözümü.</p>
     </div>
     <div class="footer-links">
       <h4>Platform</h4>
       <ul>
         <li><a href="#nasil-calisir">Nasıl Çalışır?</a></li>
         <li><a href="#ozellikler">Özellikler</a></li>
+        <li><a href="#kimler">Kimler İçin?</a></li>
         <li><a href="#yorumlar">Yorumlar</a></li>
-        <li><a href="/admin">Admin Paneli</a></li>
       </ul>
     </div>
     <div class="footer-links">
-      <h4>Bağlantılar</h4>
+      <h4>Hızlı Erişim</h4>
       <ul>
-        <li><a href="/admin">Salon Ekle</a></li>
+        <li><a href="/admin">Sitenizi Oluşturun</a></li>
         <li><a href="/admin">Giriş Yap</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-bottom">
     <span>© 2025 Çabuk Öde. Tüm hakları saklıdır.</span>
-    <span>Türk işletmeleri için 🇹🇷</span>
+    <span>Türk esnafı için 🇹🇷</span>
   </div>
 </footer>
 
 <script>
-  // Smooth scroll for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
     a.addEventListener('click', function(e) {
       var target = document.querySelector(a.getAttribute('href'));
@@ -737,14 +791,9 @@
     });
   });
 
-  // Nav shadow on scroll
   var nav = document.getElementById('mainNav');
   window.addEventListener('scroll', function() {
-    if (window.scrollY > 20) {
-      nav.style.boxShadow = '0 2px 20px rgba(0,0,0,.08)';
-    } else {
-      nav.style.boxShadow = 'none';
-    }
+    nav.style.boxShadow = window.scrollY > 20 ? '0 2px 20px rgba(0,0,0,.08)' : 'none';
   });
 </script>
 </body>
