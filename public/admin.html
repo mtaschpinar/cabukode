@@ -92,6 +92,7 @@
   <div style="display:flex;gap:10px;align-items:center">
     <button class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted)" onclick="showTab('salons')">İşletmeler</button>
     <button class="nav-btn" style="background:var(--gold);color:#000" onclick="showTab('ads')">Reklamlar</button>
+    <button class="nav-btn" id="yorumNavBtn" style="background:#0ea5e9;color:#fff;position:relative" onclick="showTab('yorumlar')">Yorumlar <span id="yorumBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:#e94560;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;display:flex;align-items:center;justify-content:center">0</span></button>
     <button class="nav-btn" id="basvuruNavBtn" style="background:#6366f1;color:#fff;position:relative" onclick="showTab('basvurular')">
       Başvurular
       <span id="basvuruBadge" style="display:none;position:absolute;top:-7px;right:-7px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;align-items:center;justify-content:center;">0</span>
@@ -135,6 +136,21 @@
   <h2>Kayıtlı İşletmeler</h2>
   <div class="salon-grid" id="salonGrid">
     <div class="empty"><div class="icon">🏢</div><p>Henüz işletme eklenmedi.<br>Sağ üstten ekleyin.</p></div>
+  </div>
+</div>
+
+<!-- YORUMLAR SEKMESİ -->
+<div class="container" id="tabYorumlar" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="margin-bottom:0">Yorum Yönetimi</h2>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="filterYorum('bekliyor')" id="yBtn_bekliyor" class="nav-btn" style="background:var(--accent);font-size:13px">⏳ Bekleyenler</button>
+    <button onclick="filterYorum('onaylandi')" id="yBtn_onaylandi" class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:13px">✅ Onaylananlar</button>
+    <button onclick="filterYorum('hepsi')" id="yBtn_hepsi" class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:13px">Hepsi</button>
+  </div>
+  <div id="yorumGrid">
+    <div class="empty"><div class="icon">💬</div><p>Henüz yorum yok.</p></div>
   </div>
 </div>
 
@@ -779,8 +795,10 @@ function showTab(tab){
   document.getElementById('tabSalons').style.display     = tab==='salons'     ? 'block' : 'none';
   document.getElementById('tabAds').style.display        = tab==='ads'        ? 'block' : 'none';
   document.getElementById('tabBasvurular').style.display = tab==='basvurular' ? 'block' : 'none';
+  document.getElementById('tabYorumlar').style.display   = tab==='yorumlar'   ? 'block' : 'none';
   if(tab==='ads') loadAds();
   if(tab==='basvurular') loadBasvurular();
+  if(tab==='yorumlar') loadYorumlar();
 }
 
 // ── Reklam Fonksiyonları ─────────────────────────────────────────────────────────────────────────────────────
@@ -1101,12 +1119,90 @@ async function silBasvuru(id) {
   await loadBasvurular();
 }
 
+// ── Yorum Fonksiyonları ─────────────────────────────────────────────────────────────────────────────────────
+let _tumYorumlar = [];
+let _yorumFilter = 'bekliyor';
+
+async function loadYorumlar() {
+  try {
+    const res = await fetch('/api/reviews');
+    _tumYorumlar = await res.json();
+    // Badge güncelle
+    const bekleyenSayi = _tumYorumlar.filter(y => !y.approved).length;
+    const badge = document.getElementById('yorumBadge');
+    if (badge) {
+      badge.textContent = bekleyenSayi;
+      badge.style.display = bekleyenSayi > 0 ? 'flex' : 'none';
+    }
+    renderYorumlar();
+  } catch(e) { console.error('Yorumlar yüklenemedi:', e); }
+}
+
+function filterYorum(f) {
+  _yorumFilter = f;
+  ['bekliyor','onaylandi','hepsi'].forEach(k => {
+    const btn = document.getElementById('yBtn_' + k);
+    if (btn) btn.style.background = k === f ? 'var(--accent)' : 'var(--card2)';
+    if (btn && k !== f) { btn.style.border = '1px solid var(--border)'; btn.style.color = 'var(--muted)'; }
+    if (btn && k === f) { btn.style.border = 'none'; btn.style.color = '#fff'; }
+  });
+  renderYorumlar();
+}
+
+function renderYorumlar() {
+  const grid = document.getElementById('yorumGrid');
+  if (!grid) return;
+  let liste = _tumYorumlar;
+  if (_yorumFilter === 'bekliyor') liste = _tumYorumlar.filter(y => !y.approved);
+  if (_yorumFilter === 'onaylandi') liste = _tumYorumlar.filter(y => y.approved);
+  if (!liste.length) {
+    grid.innerHTML = '<div class="empty"><div class="icon">💬</div><p>Bu kategoride yorum yok.</p></div>';
+    return;
+  }
+  grid.innerHTML = liste.map(y => {
+    const stars = '★'.repeat(y.rating || 5) + '☆'.repeat(5 - (y.rating || 5));
+    const tarih = new Date(y.ts || y.created_at).toLocaleDateString('tr-TR');
+    return `
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-weight:700;font-size:15px">${y.name || 'Anonim'}</div>
+          <div style="color:#f59e0b;font-size:16px;margin:4px 0">${stars}</div>
+          <div style="font-size:13px;color:var(--muted)">${y.slug ? '🏢 ' + y.slug : ''} &bull; ${tarih}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${!y.approved ? `<button onclick="onaylaYorum('${y.id || y._id}')"
+            style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">✅ Onayla</button>` : 
+            '<span style="background:#10b981;color:#fff;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700">✅ Onaylandı</span>'}
+          <button onclick="silYorum('${y.id || y._id}')"
+            style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer">🗑 Sil</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:14px;line-height:1.5">${y.comment || ''}</div>
+    </div>`;
+  }).join('');
+}
+
+async function onaylaYorum(id) {
+  await fetch(`/api/reviews/${id}/approve`, { method: 'PUT' });
+  showToast('✅ Yorum onaylandı!', '#10b981');
+  await loadYorumlar();
+}
+
+async function silYorum(id) {
+  if (!confirm('Bu yorumu silmek istediğinize emin misiniz?')) return;
+  await fetch(`/api/reviews/${id}`, { method: 'DELETE' });
+  showToast('Yorum silindi.', '#c0392b');
+  await loadYorumlar();
+}
+
 // ── Başlat ─────────────────────────────────────────────────────────────────────────────────────
 if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', ()=>{ loadSalons(); loadBasvurular(); });
+  document.addEventListener('DOMContentLoaded', ()=>{ loadSalons(); loadBasvurular(); loadYorumlar(); });
 } else {
   loadSalons();
   loadBasvurular();
+  loadYorumlar();
 }
 </script>
 
