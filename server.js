@@ -35,11 +35,12 @@ async function generateSlug(base) {
 
 // ── Veritabanları ────────────────────────────────────────────────────────────
 const db = {};
-db.salons  = new Datastore({ filename: path.join(__dirname, 'data/salons.db'),  autoload: true });
-db.visits  = new Datastore({ filename: path.join(__dirname, 'data/visits.db'),  autoload: true });
-db.reviews = new Datastore({ filename: path.join(__dirname, 'data/reviews.db'), autoload: true });
-db.ads     = new Datastore({ filename: path.join(__dirname, 'data/ads.db'),     autoload: true });
-db.staff   = new Datastore({ filename: path.join(__dirname, 'data/staff.db'),   autoload: true });
+db.salons      = new Datastore({ filename: path.join(__dirname, 'data/salons.db'),      autoload: true });
+db.visits      = new Datastore({ filename: path.join(__dirname, 'data/visits.db'),      autoload: true });
+db.reviews     = new Datastore({ filename: path.join(__dirname, 'data/reviews.db'),     autoload: true });
+db.ads         = new Datastore({ filename: path.join(__dirname, 'data/ads.db'),         autoload: true });
+db.staff       = new Datastore({ filename: path.join(__dirname, 'data/staff.db'),       autoload: true });
+db.basvurular  = new Datastore({ filename: path.join(__dirname, 'data/basvurular.db'),  autoload: true });
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'public/uploads'), { recursive: true });
 
@@ -327,6 +328,104 @@ app.get('/api/reviews/:slug', (req, res) => {
 // Yorum sil (admin)
 app.delete('/api/reviews/:id', (req, res) => {
   db.reviews.remove({ _id: req.params.id }, {}, (err) => res.json({ ok: true }));
+});
+
+// ── BAŞVURU API ─────────────────────────────────────────────────────────────
+
+// Yeni başvuru gönder (herkese açık)
+app.post('/api/basvuru', (req, res) => {
+  const { isletmeAdi, isletmeTuru, sahipAdi, telefon, adres, hizmetler, iban, banka, slug } = req.body;
+  if (!isletmeAdi || !sahipAdi || !telefon) {
+    return res.status(400).json({ error: 'İşletme adı, yetkili adı ve telefon zorunludur.' });
+  }
+  const basvuru = {
+    _id: uuidv4(),
+    isletmeAdi: (isletmeAdi || '').trim(),
+    isletmeTuru: (isletmeTuru || '').trim(),
+    sahipAdi: (sahipAdi || '').trim(),
+    telefon: (telefon || '').trim(),
+    adres: (adres || '').trim(),
+    hizmetler: (hizmetler || '').trim(),
+    iban: (iban || '').replace(/\s/g, ''),
+    banka: (banka || '').trim(),
+    slug: (slug || '').trim(),
+    durum: 'bekliyor',   // 'bekliyor' | 'onaylandi' | 'reddedildi'
+    createdAt: new Date(),
+    notlar: '',
+  };
+  db.basvurular.insert(basvuru, (err, doc) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ ok: true, id: doc._id });
+  });
+});
+
+// Tüm başvuruları listele (admin)
+app.get('/api/basvurular', (req, res) => {
+  db.basvurular.find({}).sort({ createdAt: -1 }).exec((err, docs) => res.json(docs));
+});
+
+// Başvuru onayla → salona dönüştür
+app.post('/api/basvurular/:id/onayla', async (req, res) => {
+  db.basvurular.findOne({ _id: req.params.id }, async (err, doc) => {
+    if (!doc) return res.status(404).json({ error: 'Başvuru bulunamadı' });
+    if (doc.durum === 'onaylandi') return res.status(400).json({ error: 'Zaten onaylandı' });
+
+    // Slug oluştur
+    const slugBase = doc.slug ? toSlug(doc.slug) : toSlug(doc.sahipAdi || doc.isletmeAdi);
+    const slug = await generateSlug(slugBase || uuidv4().split('-')[0]);
+
+    const salon = {
+      _id: uuidv4(),
+      slug,
+      name: doc.isletmeAdi,
+      ownerName: doc.sahipAdi,
+      bank: doc.banka || '',
+      iban: doc.iban || '',
+      phone: doc.telefon,
+      address: doc.adres || '',
+      services: doc.hizmetler ? doc.hizmetler.split(',').map(s => ({ name: s.trim(), price: '' })).filter(s => s.name) : [],
+      logoUrl: null,
+      coverUrl: null,
+      createdAt: new Date(),
+      active: true,
+    };
+
+    db.salons.insert(salon, async (err2, newSalon) => {
+      if (err2) return res.status(500).json({ error: err2.message });
+
+      // QR kod oluştur
+      try {
+        const baseUrl = req.protocol + '://' + req.get('host');
+        const pageUrl = `${baseUrl}/${slug}`;
+        const qrPath  = path.join(__dirname, 'public/uploads', `qr_${slug}.png`);
+        await QRCode.toFile(qrPath, pageUrl, { width: 400, margin: 2, errorCorrectionLevel: 'H' });
+      } catch(e) { /* QR hatası kritik değil */ }
+
+      // Başvuruyu güncelle
+      db.basvurular.update({ _id: req.params.id }, { $set: { durum: 'onaylandi', salonSlug: slug, onayTarihi: new Date() } }, {}, () => {
+        res.json({ ok: true, slug, salon: newSalon });
+      });
+    });
+  });
+});
+
+// Başvuru reddet
+app.post('/api/basvurular/:id/reddet', (req, res) => {
+  const { notlar } = req.body;
+  db.basvurular.update(
+    { _id: req.params.id },
+    { $set: { durum: 'reddedildi', notlar: notlar || '', redTarihi: new Date() } },
+    {},
+    (err) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ ok: true });
+    }
+  );
+});
+
+// Başvuru sil
+app.delete('/api/basvurular/:id', (req, res) => {
+  db.basvurular.remove({ _id: req.params.id }, {}, (err) => res.json({ ok: true }));
 });
 
 // ── SAYFA ROTALARI ─────────────────────────────────────────────

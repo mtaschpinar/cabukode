@@ -92,11 +92,45 @@
   <div style="display:flex;gap:10px;align-items:center">
     <button class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted)" onclick="showTab('salons')">Salonlar</button>
     <button class="nav-btn" style="background:var(--gold);color:#000" onclick="showTab('ads')">Reklamlar</button>
+    <button class="nav-btn" id="basvuruNavBtn" style="background:#6366f1;color:#fff;position:relative" onclick="showTab('basvurular')">
+      Başvurular
+      <span id="basvuruBadge" style="display:none;position:absolute;top:-7px;right:-7px;background:#ef4444;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;align-items:center;justify-content:center;">0</span>
+    </button>
     <button class="nav-btn" onclick="openAddModal()">+ Yeni Salon</button>
   </div>
 </nav>
 
-<!-- SALONLAR SEKMESİ -->
+<!-- BAŞVURULAR SEKMESI -->
+<div class="container" id="tabBasvurular" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Başvurular</h2>
+      <p style="color:var(--muted);font-size:14px">Gelen işletme başvurularını inceleyin, onaylayın veya reddedin.</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="filterBasvuru('hepsi')" id="fBtn_hepsi" class="nav-btn" style="background:var(--accent);font-size:13px">Hepsi</button>
+      <button onclick="filterBasvuru('bekliyor')" id="fBtn_bekliyor" class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:13px">⏳ Bekleyenler</button>
+      <button onclick="filterBasvuru('onaylandi')" id="fBtn_onaylandi" class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:13px">✅ Onaylananlar</button>
+      <button onclick="filterBasvuru('reddedildi')" id="fBtn_reddedildi" class="nav-btn" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);font-size:13px">❌ Reddedilenler</button>
+    </div>
+  </div>
+  <div id="basvuruList"><div style="color:var(--muted);text-align:center;padding:60px">Yükleniyor...</div></div>
+</div>
+
+<!-- Red Notu Modal -->
+<div id="redModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--card);border-radius:16px;width:100%;max-width:420px;padding:28px;border:1px solid var(--border)">
+    <h3 style="font-size:18px;font-weight:800;margin-bottom:8px">❌ Başvuruyu Reddet</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Red sebebini belirtebilirsiniz (isteğe bağlı).</p>
+    <textarea id="redNot" rows="3" placeholder="Red sebebi..." style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-family:inherit;font-size:14px;resize:vertical"></textarea>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="closeRedModal()" style="flex:1;background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:8px;cursor:pointer;font-weight:600">Vazgeç</button>
+      <button onclick="confirmRed()" style="flex:1;background:#ef4444;color:#fff;border:none;padding:10px;border-radius:8px;cursor:pointer;font-weight:700">❌ Reddet</button>
+    </div>
+  </div>
+</div>
+
+<!-- SALONLAR SEKMESI -->
 <div class="container" id="tabSalons">
   <h2>Kayıtlı Salonlar</h2>
   <div class="salon-grid" id="salonGrid">
@@ -539,18 +573,19 @@ async function openStats(slug, name){
   document.getElementById('visitList').innerHTML=d.recent.length
     ? d.recent.map(v=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--muted)">🕐 ${fmtDate(v.ts)}</div>`).join('')
     : '<div style="color:var(--muted);font-size:13px">Henüz ziyaret yok.</div>';
-
   document.getElementById('statsOverlay').classList.add('show');
 }
 
-// ── Sekme geçişi ─────────────────────────────────────────────────────────────────
+// ── Sekme geçişi ─────────────────────────────────────────────────────────────────────────────────────
 function showTab(tab){
-  document.getElementById('tabSalons').style.display = tab==='salons' ? 'block' : 'none';
-  document.getElementById('tabAds').style.display    = tab==='ads'    ? 'block' : 'none';
+  document.getElementById('tabSalons').style.display     = tab==='salons'     ? 'block' : 'none';
+  document.getElementById('tabAds').style.display        = tab==='ads'        ? 'block' : 'none';
+  document.getElementById('tabBasvurular').style.display = tab==='basvurular' ? 'block' : 'none';
   if(tab==='ads') loadAds();
+  if(tab==='basvurular') loadBasvurular();
 }
 
-// ── Reklam fonksiyonları ─────────────────────────────────────────────────────────────────
+// ── Reklam Fonksiyonları ─────────────────────────────────────────────────────────────────────────────────────
 const AD_TYPES = { banner: 'Banner (Sayfa Üstü)', inline: 'İçerik İçi', popup: 'Popup' };
 
 async function loadAds(){
@@ -698,8 +733,130 @@ document.getElementById('staffForm').addEventListener('submit', async e => {
   showToast('Çalışan eklendi!');
 });
 
-// ── Başlat ───────────────────────────────────────────────────────────────────────────────────────
+// ── BAŞVURU FONKSİYONLARI ────────────────────────────────────────────────────────────────────────────────────────────
+let allBasvurular = [];
+let activeFilter = 'hepsi';
+
+async function loadBasvurular() {
+  try {
+    const res = await fetch('/api/basvurular');
+    allBasvurular = await res.json();
+    const bekleyen = allBasvurular.filter(b => b.durum === 'bekliyor').length;
+    const badge = document.getElementById('basvuruBadge');
+    if (bekleyen > 0) { badge.textContent = bekleyen; badge.style.display = 'flex'; }
+    else badge.style.display = 'none';
+    renderBasvurular();
+  } catch(e) {
+    document.getElementById('basvuruList').innerHTML = '<div style="color:var(--muted);text-align:center;padding:40px">Yüklenemedi.</div>';
+  }
+}
+
+function filterBasvuru(durum) {
+  activeFilter = durum;
+  ['hepsi','bekliyor','onaylandi','reddedildi'].forEach(d => {
+    const btn = document.getElementById('fBtn_' + d);
+    if (!btn) return;
+    btn.style.background = d === durum ? 'var(--accent)' : 'var(--card2)';
+    btn.style.color      = d === durum ? '#fff' : 'var(--muted)';
+    btn.style.border     = d === durum ? 'none' : '1px solid var(--border)';
+  });
+  renderBasvurular();
+}
+
+function renderBasvurular() {
+  const list = activeFilter === 'hepsi' ? allBasvurular : allBasvurular.filter(b => b.durum === activeFilter);
+  const el = document.getElementById('basvuruList');
+  if (!list.length) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:60px;font-size:15px">' +
+      (activeFilter === 'hepsi' ? 'Henüz başvuru yok.' : 'Bu kategoride başvuru yok.') + '</div>';
+    return;
+  }
+  el.innerHTML = list.map(b => {
+    const durumColor = b.durum === 'bekliyor' ? '#f59e0b' : b.durum === 'onaylandi' ? '#10b981' : '#ef4444';
+    const durumLabel = b.durum === 'bekliyor' ? '⏳ Bekliyor' : b.durum === 'onaylandi' ? '✅ Onaylandı' : '❌ Reddedildi';
+    const tarih = new Date(b.createdAt).toLocaleDateString('tr-TR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    return `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+            <span style="font-size:17px;font-weight:800;color:var(--text)">${b.isletmeAdi}</span>
+            ${b.isletmeTuru ? `<span style="background:var(--card2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--muted)">${b.isletmeTuru}</span>` : ''}
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:5px 16px;font-size:13px;color:var(--muted)">
+            <span>👤 ${b.sahipAdi}</span>
+            <span>📞 ${b.telefon}</span>
+            ${b.adres ? `<span>📍 ${b.adres}</span>` : ''}
+            ${b.hizmetler ? `<span>🛠 ${b.hizmetler}</span>` : ''}
+            ${b.iban ? `<span>💳 ${b.iban}${b.banka ? ' ('+b.banka+')' : ''}</span>` : ''}
+            ${b.slug ? `<span>🔗 cabukode.com/${b.slug}</span>` : ''}
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted)">📅 ${tarih}</div>
+          ${b.durum === 'onaylandi' && b.salonSlug ? `<div style="margin-top:6px"><a href="/${b.salonSlug}" target="_blank" style="color:#6366f1;font-size:13px;font-weight:600">🌐 cabukode.com/${b.salonSlug} →</a></div>` : ''}
+          ${b.notlar ? `<div style="margin-top:6px;font-size:12px;color:#ef4444">Not: ${b.notlar}</div>` : ''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0">
+          <span style="background:${durumColor}22;color:${durumColor};border:1px solid ${durumColor}44;border-radius:8px;padding:4px 12px;font-size:13px;font-weight:700;white-space:nowrap">${durumLabel}</span>
+          ${b.durum === 'bekliyor' ? `
+          <div style="display:flex;gap:8px">
+            <button onclick="onayla('${b._id}')" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">✅ Onayla</button>
+            <button onclick="openRedModal('${b._id}')" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">❌ Reddet</button>
+          </div>` : ''}
+          <button onclick="silBasvuru('${b._id}')" style="background:var(--card2);border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer">Sil</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function onayla(id) {
+  if (!confirm('Bu başvuruyu onaylamak ve siteyi yayına almak istediğinize emin misiniz?')) return;
+  const res = await fetch(`/api/basvurular/${id}/onayla`, { method: 'POST' });
+  const data = await res.json();
+  if (data.ok) {
+    showToast(`✅ Onaylandı! Site: cabukode.com/${data.slug}`, '#10b981');
+    await loadBasvurular();
+    await loadSalons();
+  } else {
+    showToast('Hata: ' + (data.error || 'Bilinmeyen hata'), '#e94560');
+  }
+}
+
+let redTargetId = null;
+function openRedModal(id) {
+  redTargetId = id;
+  document.getElementById('redNot').value = '';
+  const m = document.getElementById('redModal');
+  m.style.display = 'flex';
+}
+function closeRedModal() {
+  document.getElementById('redModal').style.display = 'none';
+  redTargetId = null;
+}
+async function confirmRed() {
+  if (!redTargetId) return;
+  const notlar = document.getElementById('redNot').value.trim();
+  const res = await fetch(`/api/basvurular/${redTargetId}/reddet`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notlar }),
+  });
+  const data = await res.json();
+  if (data.ok) {
+    showToast('Başvuru reddedildi.', '#ef4444');
+    closeRedModal();
+    await loadBasvurular();
+  }
+}
+async function silBasvuru(id) {
+  if (!confirm('Bu başvuruyu silmek istediğinize emin misiniz?')) return;
+  await fetch(`/api/basvurular/${id}`, { method: 'DELETE' });
+  showToast('Başvuru silindi.', '#c0392b');
+  await loadBasvurular();
+}
+
+// ── Başlat ────────────────────────────────────────────────────────────────────────────────────────────
 loadSalons();
-</script>
+loadBasvurular();script>
 </body>
 </html>

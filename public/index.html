@@ -5,6 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Çabuk Öde – Esnaflar İçin Ücretsiz Sanal Kartvizit ve Mini Site</title>
   <meta name="description" content="Berber, galeri, telefon tamircisi, fırın — her esnaf için ücretsiz dijital kartvizit. cabukode.com/firmaniz adresinde hizmetleriniz, iletişim bilgileriniz ve daha fazlası." />
+  <!-- Başvuru Modal Stilleri -->
+  <style id="modal-extra">
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,23,42,.7); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 560px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 30px 80px rgba(0,0,0,.25);
+      animation: slideUp .25s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .modal-head {
+      padding: 28px 28px 0;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .modal-head h3 { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+    .modal-head p  { font-size: .875rem; color: #64748b; }
+    .modal-close {
+      background: #f1f5f9; border: none; border-radius: 8px;
+      width: 36px; height: 36px; font-size: 1.1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-left: 12px; color: #64748b;
+      transition: background .2s;
+    }
+    .modal-close:hover { background: #e2e8f0; }
+    .modal-body { padding: 20px 28px 28px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block; font-size: .8rem; font-weight: 600; color: #374151;
+      margin-bottom: 5px;
+    }
+    .form-group label .req { color: #ef4444; margin-left: 2px; }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 10px 13px;
+      border: 1.5px solid #e2e8f0; border-radius: 8px;
+      font-size: .9rem; font-family: inherit; color: #0f172a;
+      background: #fff; outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+    }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+    .form-group .hint { font-size: .75rem; color: #94a3b8; margin-top: 4px; }
+    .form-divider {
+      border: none; border-top: 1px solid #f1f5f9;
+      margin: 16px 0;
+    }
+    .form-section-title {
+      font-size: .75rem; font-weight: 700; color: #94a3b8;
+      text-transform: uppercase; letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+    .btn-submit {
+      width: 100%; padding: 13px;
+      background: #6366f1; color: #fff;
+      border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 700; cursor: pointer;
+      transition: background .2s, transform .15s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: #4f46e5; transform: translateY(-1px); }
+    .btn-submit:disabled { background: #a5b4fc; cursor: not-allowed; transform: none; }
+    .form-success {
+      display: none; text-align: center; padding: 20px 0 8px;
+    }
+    .form-success .success-icon { font-size: 3rem; margin-bottom: 12px; }
+    .form-success h4 { font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 8px; }
+    .form-success p  { font-size: .9rem; color: #64748b; line-height: 1.6; }
+    @media (max-width: 480px) {
+      .modal-box { border-radius: 16px; }
+      .modal-head, .modal-body { padding-left: 20px; padding-right: 20px; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -473,7 +562,7 @@
     <li><a href="#kimler">Kimler İçin?</a></li>
     <li><a href="/admin">Giriş Yap</a></li>
   </ul>
-  <a class="nav-cta" href="/admin">Ücretsiz Sitenizi Açın</a>
+  <a class="nav-cta" href="#" onclick="openBasvuru();return false;">Ücretsiz Başvurun</a>
   <button class="hamburger" onclick="document.getElementById('mobileMenu').classList.add('open')" aria-label="Menü">
     <span></span><span></span><span></span>
   </button>
@@ -486,7 +575,7 @@
   <a href="#ozellikler" onclick="document.getElementById('mobileMenu').classList.remove('open')">Özellikler</a>
   <a href="#kimler" onclick="document.getElementById('mobileMenu').classList.remove('open')">Kimler İçin?</a>
   <a href="/admin" onclick="document.getElementById('mobileMenu').classList.remove('open')">Giriş Yap</a>
-  <a href="/admin" onclick="document.getElementById('mobileMenu').classList.remove('open')" style="background:var(--brand);padding:12px 28px;border-radius:10px;font-size:1rem;">Ücretsiz Sitenizi Açın</a>
+      <a href="#" onclick="document.getElementById('mobileMenu').classList.remove('open');openBasvuru();return false;" style="background:var(--brand);padding:12px 28px;border-radius:10px;font-size:1rem;">Ücretsiz Başvurun</a>
 </div>
 
 <!-- HERO -->
@@ -499,7 +588,7 @@
         Hizmetleriniz, iletişim bilgileriniz, çalışanlarınız ve ödeme bilgileriniz tek sayfada. Müşterileriniz sizi QR kodla veya linkle anında bulsun.
       </p>
       <div class="hero-actions">
-        <a href="/admin" class="btn-primary">Sanal Sitenizi Açın — Ücretsiz</a>
+        <a href="#" onclick="openBasvuru();return false;" class="btn-primary">Ücretsiz Başvurun →</a>
         <a href="#nasil-calisir" class="btn-secondary">Nasıl Çalışır?</a>
       </div>
       <div class="hero-url-bar">
@@ -746,7 +835,7 @@
 <section class="cta-section">
   <h2>İşletmenizin dijital adresi hazır mı?</h2>
   <p>Ücretsiz, hızlı ve kolay. 3 dakikada işletmenize özel sanal kartvizit sayfanız yayında.</p>
-  <a href="/admin" class="btn-white">Sanal Sitenizi Şimdi Açın →</a>
+  <a href="#" onclick="openBasvuru();return false;" class="btn-white">Ücretsiz Başvurun →</a>
   <p class="cta-note">Zaten hesabınız var mı? <a href="/admin" style="color:#fff;font-weight:700;">Giriş yapın →</a></p>
 </section>
 
@@ -769,8 +858,8 @@
     <div class="footer-links">
       <h4>Hızlı Erişim</h4>
       <ul>
-        <li><a href="/admin">Sitenizi Oluşturun</a></li>
-        <li><a href="/admin">Giriş Yap</a></li>
+        <li><a href="#" onclick="openBasvuru();return false;">Ücretsiz Başvurun</a></li>
+        <li><a href="/admin">Admin Girişi</a></li>
       </ul>
     </div>
   </div>
@@ -780,8 +869,107 @@
   </div>
 </footer>
 
+<!-- BAŞVURU MODAL -->
+<div class="modal-overlay" id="basvuruModal" onclick="if(event.target===this)closeBasvuru()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <h3>🚀 Ücretsiz Başvurun</h3>
+        <p>Bilgilerinizi doldurun, 24 saat içinde siteniz hazır.</p>
+      </div>
+      <button class="modal-close" onclick="closeBasvuru()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="basvuruForm">
+        <div class="form-section-title">İşletme Bilgileri</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>İşletme Adı <span class="req">*</span></label>
+            <input type="text" id="f_isletmeAdi" placeholder="Örn: Ahmet Berber" />
+          </div>
+          <div class="form-group">
+            <label>İşletme Türü</label>
+            <select id="f_isletmeTuru">
+              <option value="">Seçin...</option>
+              <option>Berber &amp; Kuaför</option>
+              <option>Oto Galeri</option>
+              <option>Telefon Tamircisi</option>
+              <option>Fırın &amp; Pastane</option>
+              <option>Elektrikçi &amp; Tesisatçı</option>
+              <option>Giyim Mağazası</option>
+              <option>Restoran &amp; Kafe</option>
+              <option>Güzellik Salonu</option>
+              <option>Eczane &amp; Klinik</option>
+              <option>Emlakçı</option>
+              <option>Bakkal &amp; Market</option>
+              <option>Diğer</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Yetkili Adı Soyadı <span class="req">*</span></label>
+            <input type="text" id="f_sahipAdi" placeholder="Ad Soyad" />
+          </div>
+          <div class="form-group">
+            <label>Telefon <span class="req">*</span></label>
+            <input type="tel" id="f_telefon" placeholder="05XX XXX XX XX" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Adres</label>
+          <input type="text" id="f_adres" placeholder="İlçe, Şehir" />
+        </div>
+        <div class="form-group">
+          <label>Sunduğunuz Hizmetler</label>
+          <input type="text" id="f_hizmetler" placeholder="Örn: Saç kesimi, sakal, boya (virgülle ayırın)" />
+          <div class="hint">Virgülle ayırarak birden fazla hizmet yazabilirsiniz.</div>
+        </div>
+
+        <hr class="form-divider" />
+        <div class="form-section-title">Ödeme Bilgileri (İsteğe Bağlı)</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>IBAN</label>
+            <input type="text" id="f_iban" placeholder="TR00 0000 0000 0000 0000 0000 00" />
+          </div>
+          <div class="form-group">
+            <label>Banka</label>
+            <input type="text" id="f_banka" placeholder="Örn: Ziraat Bankası" />
+          </div>
+        </div>
+
+        <hr class="form-divider" />
+        <div class="form-section-title">Site Adresi Tercihi (İsteğe Bağlı)</div>
+        <div class="form-group">
+          <label>Tercih Ettiğiniz Adres</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:.85rem;color:#6366f1;font-weight:600;white-space:nowrap;">cabukode.com/</span>
+            <input type="text" id="f_slug" placeholder="firmaniz" style="flex:1;" />
+          </div>
+          <div class="hint">Boş bırakırsanız otomatik oluşturulur. Sadece harf ve rakam kullanın.</div>
+        </div>
+
+        <div id="formError" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:.85rem;color:#dc2626;margin-bottom:12px;"></div>
+
+        <button class="btn-submit" id="submitBtn" onclick="submitBasvuru()">Başvuruyu Gönder →</button>
+        <p style="text-align:center;font-size:.78rem;color:#94a3b8;margin-top:10px;">Başvurunuz 24 saat içinde incelenir. Onay sonrası siteniz yayına alınır.</p>
+      </div>
+
+      <div class="form-success" id="basvuruSuccess">
+        <div class="success-icon">🎉</div>
+        <h4>Başvurunuz Alındı!</h4>
+        <p>Bilgilerinizi inceleyeceğiz ve <strong>24 saat içinde</strong> sitenizi yayına alacağız.<br/>Onay sonrası size bilgi vereceğiz.</p>
+        <p style="margin-top:16px;font-size:.8rem;color:#94a3b8;">Sorularınız için WhatsApp'tan ulaşabilirsiniz.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+  // Smooth scroll for anchor links (# ile başlayan ama onclick'i olmayanlar)
   document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    if (a.getAttribute('onclick')) return;
     a.addEventListener('click', function(e) {
       var target = document.querySelector(a.getAttribute('href'));
       if (target) {
@@ -791,10 +979,78 @@
     });
   });
 
+  // Nav shadow on scroll
   var nav = document.getElementById('mainNav');
   window.addEventListener('scroll', function() {
     nav.style.boxShadow = window.scrollY > 20 ? '0 2px 20px rgba(0,0,0,.08)' : 'none';
   });
+
+  // Modal aç/kapat
+  function openBasvuru() {
+    document.getElementById('basvuruModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeBasvuru() {
+    document.getElementById('basvuruModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeBasvuru();
+  });
+
+  // Başvuru gönder
+  function submitBasvuru() {
+    var isletmeAdi = document.getElementById('f_isletmeAdi').value.trim();
+    var sahipAdi   = document.getElementById('f_sahipAdi').value.trim();
+    var telefon    = document.getElementById('f_telefon').value.trim();
+    var errEl      = document.getElementById('formError');
+
+    errEl.style.display = 'none';
+
+    if (!isletmeAdi) { errEl.textContent = 'İşletme adı zorunludur.'; errEl.style.display='block'; return; }
+    if (!sahipAdi)   { errEl.textContent = 'Yetkili adı zorunludur.'; errEl.style.display='block'; return; }
+    if (!telefon)    { errEl.textContent = 'Telefon numarası zorunludur.'; errEl.style.display='block'; return; }
+
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Gönderiliyor...';
+
+    var data = {
+      isletmeAdi: isletmeAdi,
+      isletmeTuru: document.getElementById('f_isletmeTuru').value,
+      sahipAdi: sahipAdi,
+      telefon: telefon,
+      adres: document.getElementById('f_adres').value.trim(),
+      hizmetler: document.getElementById('f_hizmetler').value.trim(),
+      iban: document.getElementById('f_iban').value.trim(),
+      banka: document.getElementById('f_banka').value.trim(),
+      slug: document.getElementById('f_slug').value.trim(),
+    };
+
+    fetch('/api/basvuru', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.ok) {
+        document.getElementById('basvuruForm').style.display = 'none';
+        document.getElementById('basvuruSuccess').style.display = 'block';
+      } else {
+        errEl.textContent = res.error || 'Bir hata oluştu. Lütfen tekrar deneyin.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Başvuruyu Gönder →';
+      }
+    })
+    .catch(function() {
+      errEl.textContent = 'Bağlantı hatası. Lütfen tekrar deneyin.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Başvuruyu Gönder →';
+    });
+  }
 </script>
 </body>
 </html>
