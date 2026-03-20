@@ -796,6 +796,7 @@ function showTab(tab){
   document.getElementById('tabAds').style.display        = tab==='ads'        ? 'block' : 'none';
   document.getElementById('tabBasvurular').style.display = tab==='basvurular' ? 'block' : 'none';
   document.getElementById('tabYorumlar').style.display   = tab==='yorumlar'   ? 'block' : 'none';
+  if(tab==='salons') loadSalons();
   if(tab==='ads') loadAds();
   if(tab==='basvurular') loadBasvurular();
   if(tab==='yorumlar') loadYorumlar();
