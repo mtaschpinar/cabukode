@@ -541,11 +541,8 @@ async function loadSalon(){
       document.getElementById('bankCardSection').style.display='block';
       document.getElementById('bankName').textContent = s.bank || 'Banka';
       document.getElementById('bankAvatar').textContent = (s.bank||'B').charAt(0).toUpperCase();
-    document.getElementById('bankAvatar').textContent = s.bank.charAt(0).toUpperCase();
 
     document.getElementById('receiverName').textContent = s.ownerName;
-    const initials = s.ownerName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('receiverInitial').textContent = initials;
 
       const fmt = s.iban.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s.iban;
       document.getElementById('ibanDisplay').textContent = fmt;
