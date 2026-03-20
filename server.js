@@ -351,9 +351,9 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/admin.html'));
 });
 
-// Ana sayfa → admin'e yönlendir
+// Ana sayfa → tanıtım sitesi
 app.get('/', (req, res) => {
-  res.redirect('/admin');
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 app.listen(PORT, () => {
