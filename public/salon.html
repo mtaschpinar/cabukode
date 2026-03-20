@@ -269,16 +269,15 @@
 </head>
 <body>
 
-  <!-- REKLAM -->
-  <div class="ad-bar">
-    <div class="ad-label">Sponsorlu</div>
-    <a class="ad-inner" href="#" id="adLink">
-      <div class="ad-icon">✂️</div>
+  <!-- ÜCRETSIZ BANNER - SABİT ÖZ REKLAM -->
+  <div class="ad-bar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-bottom:none;padding:10px 16px">
+    <a class="ad-inner" href="https://cabukode.com" target="_blank" style="background:rgba(255,255,255,.15);text-decoration:none">
+      <div class="ad-icon" style="font-size:20px">🚀</div>
       <div class="ad-text">
-        <strong>Saç Bakım Ürünleri %30 İndirimde</strong>
-        <span>Profesyonel salon ürünleri kapınıza gelsin</span>
+        <strong style="color:#fff">Siz de ücretsiz dijital kartvizit edinin!</strong>
+        <span style="color:rgba(255,255,255,.85)">3 dakikada cabukode.com/firmaniz hazır</span>
       </div>
-      <div class="ad-cta">İncele</div>
+      <div class="ad-cta" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:#fff">Başvur</div>
     </a>
   </div>
 
@@ -323,10 +322,10 @@
       </div>
     </div>
 
-    <!-- Hizmet Tarifesi (Açılır/Kapanır) -->
+    <!-- Hizmetler (Açılır/Kapanır) -->
     <div class="services-card" id="servicesCard" style="display:none">
       <div class="services-toggle" onclick="toggleServices()">
-        <span>💈 Hizmet Tarifesi</span>
+        <span>🛠 Hizmetler</span>
         <span class="toggle-arrow" id="servicesArrow">▼</span>
       </div>
       <div class="services-body" id="servicesBody" style="display:none">
@@ -384,13 +383,18 @@
       </a>
     </div>
 
-    <!-- Adımlar -->
-    <div class="steps-card">
-      <div class="card-title">💡 Nasıl Ödeme Yapılır?</div>
-      <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Alıcı adını</strong> kopyala, banka uygulamanı aç</div></div>
-      <div class="step"><div class="step-num">2</div><div class="step-text"><strong>EFT / Havale</strong> ekranında alıcı adını yapıştır</div></div>
-      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>IBAN'ı</strong> kopyala ve IBAN alanına yapıştır</div></div>
-      <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Tutarı gir</strong> ve gönder ✅</div></div>
+    <!-- Nasıl Ödeme Yapılır? (Açılır/Kapanır) -->
+    <div class="steps-card" style="padding:0;overflow:hidden">
+      <button onclick="toggleOdeme()" style="width:100%;background:none;border:none;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:var(--text);font-family:inherit;-webkit-tap-highlight-color:transparent">
+        <div class="card-title" style="margin-bottom:0">💡 Nasıl Ödeme Yapılır?</div>
+        <span id="odemeArrow" style="font-size:12px;color:var(--muted);transition:transform .25s">▼</span>
+      </button>
+      <div id="odemeBody" style="display:none;padding:0 18px 16px">
+        <div class="step"><div class="step-num">1</div><div class="step-text"><strong>Alıcı adını</strong> kopyala, banka uygulamanı aç</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text"><strong>EFT / Havale</strong> ekranında alıcı adını yapıştır</div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text"><strong>İBAN'ı</strong> kopyala ve IBAN alanına yapıştır</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text"><strong>Tutarı gir</strong> ve gönder ✅</div></div>
+      </div>
     </div>
 
     <!-- Çalışanlar -->
@@ -404,7 +408,7 @@
 
     <!-- Puan & Yorum Ver -->
     <div class="rating-card" id="ratingCard">
-      <div class="card-title">⭐ Bu Salonu Puanla</div>
+      <div class="card-title">⭐ Bu İşletmeyi Puanla</div>
       <div id="ratingForm">
         <div class="stars-row" id="starsRow">
           <button class="star-btn" data-v="1" onclick="setStar(1)">⭐</button>
@@ -434,7 +438,7 @@
 
   <div class="error-page" id="errorPage" style="display:none">
     <div class="icon">❌</div>
-    <p>Salon bulunamadı.</p>
+    <p>İşletme bulunamadı.</p>
   </div>
 
   <!-- POPUP REKLAM -->
@@ -616,6 +620,13 @@ function toggleServices(){
   const isOpen = body.style.display !== 'none';
   body.style.display = isOpen ? 'none' : 'block';
   arrow.classList.toggle('open', !isOpen);
+}
+function toggleOdeme(){
+  const body = document.getElementById('odemeBody');
+  const arrow = document.getElementById('odemeArrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
 function setStar(val){
