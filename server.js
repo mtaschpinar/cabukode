@@ -222,7 +222,13 @@ app.get('/api/stats/:slug', async (req, res) => {
     const today = new Date(); today.setHours(0,0,0,0);
     const { rows: todayRows } = await pool.query(
       'SELECT COUNT(*) as cnt FROM visits WHERE slug=$1 AND ts >= $2', [req.params.slug, today]);
-    res.json({ total: parseInt(rows[0].total), today: parseInt(todayRows[0].cnt) });
+    // Saatlik dağılım
+    const { rows: hourlyRows } = await pool.query(
+      `SELECT EXTRACT(HOUR FROM ts) as hr, COUNT(*) as cnt FROM visits WHERE slug=$1 AND ts >= $2 GROUP BY hr ORDER BY hr`,
+      [req.params.slug, today]);
+    const hourly = Array(24).fill(0);
+    hourlyRows.forEach(r => { hourly[parseInt(r.hr)] = parseInt(r.cnt); });
+    res.json({ total: parseInt(rows[0].total), todayTotal: parseInt(todayRows[0].cnt), today: parseInt(todayRows[0].cnt), hourly });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -249,6 +255,19 @@ app.get('/api/qr/:slug', async (req, res) => {
       await QRCode.toFile(qrPath, `${baseUrl}/${req.params.slug}`, { width: 400, margin: 2 });
     }
     res.sendFile(qrPath);
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// QR - admin paneli için POST endpoint
+app.post('/api/salons/:slug/qr', async (req, res) => {
+  try {
+    const slug = req.params.slug;
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const pageUrl = `${baseUrl}/${slug}`;
+    const qrPath = path.join(__dirname, 'public/uploads', `qr_${slug}.png`);
+    await QRCode.toFile(qrPath, pageUrl, { width: 400, margin: 2, errorCorrectionLevel: 'H' });
+    const qrUrl = `/uploads/qr_${slug}.png`;
+    res.json({ qrUrl, pageUrl });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
 

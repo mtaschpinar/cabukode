@@ -391,6 +391,30 @@
         <div id="menuListEl"></div>
       </div>
     </div>
+    <!-- IBAN / Ödeme Kartı -->
+    <div class="bank-card" id="bankCardSection" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div class="info-icon iban-icon" id="bankAvatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;flex-shrink:0">B</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text)" id="bankName">Banka</div>
+          <div style="font-size:12px;color:var(--muted)">Havale / EFT</div>
+        </div>
+      </div>
+      <div class="info-row" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">Alıcı Adı</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text)" id="receiverName">—</div>
+        </div>
+        <button onclick="copyName(this)" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text)">Kopyala</button>
+      </div>
+      <div class="info-row" style="display:flex;align-items:center;justify-content:space-between;padding:10px 0">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px">IBAN</div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:.5px;font-family:monospace" id="ibanDisplay">—</div>
+        </div>
+        <button onclick="copyIBAN(this)" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text)">Kopyala</button>
+      </div>
+    </div>
     <!-- Nasıl Ödeme Yapılır? (Açılır/Kapanır) -->
     <div class="steps-card" style="padding:0;overflow:hidden">
       <button onclick="toggleOdeme()" style="width:100%;background:none;border:none;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:var(--text);font-family:inherit;-webkit-tap-highlight-color:transparent">
@@ -513,15 +537,19 @@ async function loadSalon(){
     // Puan rozeti - yorumlardan çek
     loadRatingBadge();
 
-    document.getElementById('bankName').textContent = s.bank;
+    if(s.iban){
+      document.getElementById('bankCardSection').style.display='block';
+      document.getElementById('bankName').textContent = s.bank || 'Banka';
+      document.getElementById('bankAvatar').textContent = (s.bank||'B').charAt(0).toUpperCase();
     document.getElementById('bankAvatar').textContent = s.bank.charAt(0).toUpperCase();
 
     document.getElementById('receiverName').textContent = s.ownerName;
     const initials = s.ownerName.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
     document.getElementById('receiverInitial').textContent = initials;
 
-    const fmt = s.iban.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s.iban;
-    document.getElementById('ibanDisplay').textContent = fmt;
+      const fmt = s.iban.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s.iban;
+      document.getElementById('ibanDisplay').textContent = fmt;
+    }
 
     if(s.servicesActive !== false && s.services && s.services.length){
       const list = document.getElementById('servicesList');
