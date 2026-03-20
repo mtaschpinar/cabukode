@@ -41,6 +41,7 @@ db.reviews     = new Datastore({ filename: path.join(__dirname, 'data/reviews.db
 db.ads         = new Datastore({ filename: path.join(__dirname, 'data/ads.db'),         autoload: true });
 db.staff       = new Datastore({ filename: path.join(__dirname, 'data/staff.db'),       autoload: true });
 db.basvurular  = new Datastore({ filename: path.join(__dirname, 'data/basvurular.db'),  autoload: true });
+db.mesajlar    = new Datastore({ filename: path.join(__dirname, 'data/mesajlar.db'),    autoload: true });
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'public/uploads'), { recursive: true });
 
@@ -76,7 +77,9 @@ app.get('/api/salons/:slug', (req, res) => {
 // Salon ekle
 app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',maxCount:1}]), async (req, res) => {
   try {
-    const { name, ownerName, bank, iban, phone, address, services, customSlug } = req.body;
+    const { name, ownerName, bank, iban, phone, address, services, customSlug,
+            bio, whatsapp, mapsUrl, instagram, facebook, tiktok, website,
+            calisma, kampanyalar, menu } = req.body;
     // Özel slug varsa onu kullan, yoksa salon adından otomatik oluştur
     const slugBase = customSlug ? toSlug(customSlug) : toSlug(ownerName || name);
     const slug = await generateSlug(slugBase || uuidv4().split('-')[0]);
@@ -86,6 +89,12 @@ app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',ma
     // Hizmetleri parse et
     let parsedServices = [];
     try { parsedServices = JSON.parse(services || '[]'); } catch(e) {}
+    let parsedCalisma = {};
+    try { parsedCalisma = JSON.parse(calisma || '{}'); } catch(e) {}
+    let parsedKampanyalar = [];
+    try { parsedKampanyalar = JSON.parse(kampanyalar || '[]'); } catch(e) {}
+    let parsedMenu = [];
+    try { parsedMenu = JSON.parse(menu || '[]'); } catch(e) {}
 
     const salon = {
       _id: uuidv4(),
@@ -96,6 +105,16 @@ app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',ma
       iban: iban.replace(/\s/g, ''),
       phone: phone || '',
       address: address || '',
+      bio: (bio || '').trim(),
+      whatsapp: (whatsapp || '').replace(/\s/g, ''),
+      mapsUrl: (mapsUrl || '').trim(),
+      instagram: (instagram || '').trim(),
+      facebook: (facebook || '').trim(),
+      tiktok: (tiktok || '').trim(),
+      website: (website || '').trim(),
+      calisma: parsedCalisma,
+      kampanyalar: parsedKampanyalar,
+      menu: parsedMenu,
       services: parsedServices,
       logoUrl,
       coverUrl: coverUrl || null,
@@ -125,12 +144,25 @@ app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',ma
 
 // Salon güncelle
 app.put('/api/salons/:slug', upload.fields([{name:'logo',maxCount:1},{name:'cover',maxCount:1}]), (req, res) => {
-  const { name, ownerName, bank, iban, phone, address, services } = req.body;
-  let update = { name, ownerName, bank, phone, address };
+  const { name, ownerName, bank, iban, phone, address, services,
+          bio, whatsapp, mapsUrl, instagram, facebook, tiktok, website,
+          calisma, kampanyalar, menu } = req.body;
+  let update = { name, ownerName, bank, phone, address,
+    bio: (bio || '').trim(),
+    whatsapp: (whatsapp || '').replace(/\s/g, ''),
+    mapsUrl: (mapsUrl || '').trim(),
+    instagram: (instagram || '').trim(),
+    facebook: (facebook || '').trim(),
+    tiktok: (tiktok || '').trim(),
+    website: (website || '').trim(),
+  };
   if (iban) update.iban = iban.replace(/\s/g, '');
   if (req.files?.logo?.[0])  update.logoUrl  = '/uploads/' + req.files.logo[0].filename;
   if (req.files?.cover?.[0]) update.coverUrl = '/uploads/' + req.files.cover[0].filename;
-  try { update.services = JSON.parse(services || '[]'); } catch(e) {}
+  try { update.services    = JSON.parse(services    || '[]'); } catch(e) {}
+  try { update.calisma     = JSON.parse(calisma     || '{}'); } catch(e) {}
+  try { update.kampanyalar = JSON.parse(kampanyalar || '[]'); } catch(e) {}
+  try { update.menu        = JSON.parse(menu        || '[]'); } catch(e) {}
 
   db.salons.update({ slug: req.params.slug }, { $set: update }, {}, (err, n) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -328,6 +360,47 @@ app.get('/api/reviews/:slug', (req, res) => {
 // Yorum sil (admin)
 app.delete('/api/reviews/:id', (req, res) => {
   db.reviews.remove({ _id: req.params.id }, {}, (err) => res.json({ ok: true }));
+});
+
+// ── MÜŞTERİ MESAJ API ─────────────────────────────────────────────────────────────────────────────────────
+
+// Mesaj gönder
+app.post('/api/mesaj/:slug', (req, res) => {
+  const { ad, telefon, mesaj } = req.body;
+  if (!ad || !mesaj) return res.status(400).json({ error: 'Ad ve mesaj zorunludur.' });
+  const doc = {
+    _id: uuidv4(),
+    slug: req.params.slug,
+    ad: (ad || '').trim().slice(0, 60),
+    telefon: (telefon || '').trim().slice(0, 20),
+    mesaj: (mesaj || '').trim().slice(0, 500),
+    okundu: false,
+    ts: new Date(),
+  };
+  db.mesajlar.insert(doc, (err, newDoc) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ ok: true });
+  });
+});
+
+// İşletmenin mesajlarını getir (admin)
+app.get('/api/mesajlar/:slug', (req, res) => {
+  db.mesajlar.find({ slug: req.params.slug }).sort({ ts: -1 }).exec((err, docs) => res.json(docs));
+});
+
+// Mesaj okundu işaretle
+app.put('/api/mesaj/:id/okundu', (req, res) => {
+  db.mesajlar.update({ _id: req.params.id }, { $set: { okundu: true } }, {}, () => res.json({ ok: true }));
+});
+
+// Mesaj sil
+app.delete('/api/mesaj/:id', (req, res) => {
+  db.mesajlar.remove({ _id: req.params.id }, {}, () => res.json({ ok: true }));
+});
+
+// Tüm mesajları listele (admin genel bakış)
+app.get('/api/mesajlar', (req, res) => {
+  db.mesajlar.find({}).sort({ ts: -1 }).limit(200).exec((err, docs) => res.json(docs));
 });
 
 // ── BAŞVURU API ─────────────────────────────────────────────────────────────

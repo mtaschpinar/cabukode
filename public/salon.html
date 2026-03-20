@@ -189,6 +189,42 @@
     .step-text{font-size:13px;color:var(--muted);line-height:1.4}
     .step-text strong{color:var(--text)}
 
+    /* BIO */
+    #bioSection .card-title{margin-bottom:8px}
+
+    /* SOSYAL MEDYA */
+    .sosyal-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+    .sosyal-btn:active{opacity:.75}
+    .sosyal-btn.whatsapp{background:#dcfce7;color:#16a34a;border:1.5px solid #bbf7d0}
+    .sosyal-btn.maps{background:#fef3c7;color:#d97706;border:1.5px solid #fde68a}
+    .sosyal-btn.instagram{background:#fce7f3;color:#db2777;border:1.5px solid #fbcfe8}
+    .sosyal-btn.facebook{background:#eff6ff;color:#2563eb;border:1.5px solid #bfdbfe}
+    .sosyal-btn.tiktok{background:#f0fdf4;color:#111827;border:1.5px solid #d1fae5}
+    .sosyal-btn.website{background:var(--accent-light);color:var(--accent);border:1.5px solid #c7d9ff}
+
+    /* ÇALIŞMA SAATLERi */
+    .saat-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);gap:8px}
+    .saat-row:last-child{border-bottom:none;padding-bottom:0}
+    .saat-gun{font-size:14px;color:var(--text);font-weight:600;min-width:90px}
+    .saat-val{font-size:13px;color:var(--muted);flex:1}
+    .saat-row.bugun .saat-gun{color:var(--accent);font-weight:800}
+    .saat-row.bugun .saat-val{color:var(--green);font-weight:700}
+    .bugun-badge{background:var(--accent);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+
+    /* KAMPANYA */
+    .kampanya-item{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1.5px solid #fcd34d;border-radius:14px;padding:13px 15px;margin-bottom:8px}
+    .kampanya-item:last-child{margin-bottom:0}
+    .kampanya-baslik{font-size:14px;font-weight:800;color:#92400e}
+    .kampanya-aciklama{font-size:13px;color:#b45309;margin-top:4px}
+
+    /* MENÜ */
+    .menu-item{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:10px}
+    .menu-item:last-child{border-bottom:none;padding-bottom:0}
+    .menu-sol{display:flex;flex-direction:column;gap:2px;flex:1}
+    .menu-ad{font-size:14px;color:var(--text);font-weight:600}
+    .menu-aciklama{font-size:12px;color:var(--muted)}
+    .menu-fiyat{font-size:15px;font-weight:800;color:var(--accent);white-space:nowrap}
+
     /* PUAN & YORUM */
     .rating-card{background:var(--card);border-radius:20px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
     .stars-row{display:flex;justify-content:center;gap:10px;margin:14px 0 10px}
@@ -322,6 +358,12 @@
       </div>
     </div>
 
+    <!-- Bio -->
+    <div id="bioSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div class="card-title">🏢 Hakkımızda</div>
+      <p id="bioCard" style="font-size:14px;color:var(--muted);line-height:1.7"></p>
+    </div>
+
     <!-- Hizmetler (Açılır/Kapanır) -->
     <div class="services-card" id="servicesCard" style="display:none">
       <div class="services-toggle" onclick="toggleServices()">
@@ -331,6 +373,30 @@
       <div class="services-body" id="servicesBody" style="display:none">
         <div id="servicesList"></div>
       </div>
+    </div>
+
+    <!-- Sosyal Medya & İletişim -->
+    <div id="sosyalSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div class="card-title">🔗 İletişim & Sosyal Medya</div>
+      <div id="sosyalLinks" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+
+    <!-- Çalışma Saatleri -->
+    <div id="saatlerSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div class="card-title">⏰ Çalışma Saatleri</div>
+      <div id="saatlerList"></div>
+    </div>
+
+    <!-- Kampanyalar -->
+    <div id="kampanyaSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div class="card-title">🎉 Kampanyalar & Duyurular</div>
+      <div id="kampanyaListEl"></div>
+    </div>
+
+    <!-- Menü / Ürün Listesi -->
+    <div id="menuSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div class="card-title">📝 Menü / Ürünler</div>
+      <div id="menuListEl"></div>
     </div>
 
     <!-- Banka Kartı -->
@@ -381,6 +447,32 @@
         </div>
         <div class="ad-cta">Gör</div>
       </a>
+    </div>
+
+    <!-- Mesaj / Randevu Formu -->
+    <div class="bank-card" id="mesajSection">
+      <div class="card-title">💬 Mesaj Gönder / Randevu Al</div>
+      <div id="mesajForm">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <input id="mesaj_ad" type="text" placeholder="Adınız *" maxlength="60"
+            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+          <input id="mesaj_tel" type="tel" placeholder="Telefon (isteğe bağlı)" maxlength="20"
+            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+          <textarea id="mesaj_metin" rows="3" placeholder="Mesajınız / randevu talebiniz *" maxlength="500"
+            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+          <button onclick="gondermesaj()" id="mesajBtn"
+            style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s"
+            onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'">
+            📨 Gönder
+          </button>
+        </div>
+      </div>
+      <div id="mesajTesekur" style="display:none;text-align:center;padding:16px 0;color:var(--green);font-weight:700;font-size:15px">
+        🎉 Mesajınız iletildi! En kısa sürede dönüş yapılacaktır.
+      </div>
     </div>
 
     <!-- Nasıl Ödeme Yapılır? (Açılır/Kapanır) -->
@@ -524,9 +616,59 @@ async function loadSalon(){
         </div>`).join('');
       document.getElementById('servicesCard').style.display='block';
     }
-
+    // Bio
+    if(s.bio){
+      document.getElementById('bioCard').textContent = s.bio;
+      document.getElementById('bioSection').style.display='block';
+    }
+    // Çalışma Saatleri
+    if(s.calisma && Object.keys(s.calisma).length){
+      const SIRALAMA = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+      const gunler = Object.entries(s.calisma).sort((a,b)=>SIRALAMA.indexOf(a[0])-SIRALAMA.indexOf(b[0]));
+      const bugun = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'][new Date().getDay()];
+      document.getElementById('saatlerList').innerHTML = gunler.map(([gun,saat])=>`
+        <div class="saat-row ${gun===bugun?'bugun':''}">
+          <span class="saat-gun">${gun}</span>
+          <span class="saat-val">${saat}</span>
+          ${gun===bugun?'<span class="bugun-badge">Bugun</span>':''}
+        </div>`).join('');
+      document.getElementById('saatlerSection').style.display='block';
+    }
+    // Sosyal Medya & İletişim
+    const sosyalLinks = [];
+    if(s.whatsapp) sosyalLinks.push(`<a class="sosyal-btn whatsapp" href="https://wa.me/${s.whatsapp}" target="_blank">💬 WhatsApp</a>`);
+    if(s.mapsUrl)  sosyalLinks.push(`<a class="sosyal-btn maps" href="${s.mapsUrl}" target="_blank">📍 Haritada Gör</a>`);
+    if(s.instagram) sosyalLinks.push(`<a class="sosyal-btn instagram" href="https://instagram.com/${s.instagram}" target="_blank">📸 Instagram</a>`);
+    if(s.facebook)  sosyalLinks.push(`<a class="sosyal-btn facebook" href="https://facebook.com/${s.facebook}" target="_blank">👤 Facebook</a>`);
+    if(s.tiktok)    sosyalLinks.push(`<a class="sosyal-btn tiktok" href="https://tiktok.com/@${s.tiktok}" target="_blank">🎵 TikTok</a>`);
+    if(s.website)   sosyalLinks.push(`<a class="sosyal-btn website" href="${s.website}" target="_blank">🌐 Web Sitesi</a>`);
+    if(sosyalLinks.length){
+      document.getElementById('sosyalLinks').innerHTML = sosyalLinks.join('');
+      document.getElementById('sosyalSection').style.display='block';
+    }
+    // Kampanyalar
+    if(s.kampanyalar && s.kampanyalar.length){
+      document.getElementById('kampanyaListEl').innerHTML = s.kampanyalar.map(k=>`
+        <div class="kampanya-item">
+          <div class="kampanya-baslik">🎉 ${k.baslik}</div>
+          ${k.aciklama?`<div class="kampanya-aciklama">${k.aciklama}</div>`:''}
+        </div>`).join('');
+      document.getElementById('kampanyaSection').style.display='block';
+    }
+    // Menü / Ürün Listesi
+    if(s.menu && s.menu.length){
+      document.getElementById('menuListEl').innerHTML = s.menu.map(m=>`
+        <div class="menu-item">
+          <div class="menu-sol">
+            <span class="menu-ad">${m.ad}</span>
+            ${m.aciklama?`<span class="menu-aciklama">${m.aciklama}</span>`:''}
+          </div>
+          ${m.fiyat?`<span class="menu-fiyat">₺${m.fiyat}</span>`:''}
+        </div>`).join('');
+      document.getElementById('menuSection').style.display='block';
+    }
     document.getElementById('mainContent').style.display='flex';
-    document.title = s.name + ' — Çabuk';
+    document.title = s.name + ' — Çabuk';;
   } catch(e){
     document.getElementById('errorPage').style.display='flex';
   }
@@ -627,6 +769,33 @@ function toggleOdeme(){
   const isOpen = body.style.display !== 'none';
   body.style.display = isOpen ? 'none' : 'block';
   arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+async function gondermesaj(){
+  const ad = document.getElementById('mesaj_ad').value.trim();
+  const tel = document.getElementById('mesaj_tel').value.trim();
+  const metin = document.getElementById('mesaj_metin').value.trim();
+  if(!ad){ document.getElementById('mesaj_ad').focus(); return; }
+  if(!metin){ document.getElementById('mesaj_metin').focus(); return; }
+  const btn = document.getElementById('mesajBtn');
+  btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+  try{
+    const res = await fetch(`/api/mesaj/${slug}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ad, telefon: tel, mesaj: metin })
+    });
+    const data = await res.json();
+    if(data.ok){
+      document.getElementById('mesajForm').style.display = 'none';
+      document.getElementById('mesajTesekur').style.display = 'block';
+    } else {
+      btn.disabled = false; btn.textContent = '📨 Gönder';
+      alert(data.error || 'Bir hata oluştu.');
+    }
+  } catch(e){
+    btn.disabled = false; btn.textContent = '📨 Gönder';
+  }
 }
 
 function setStar(val){

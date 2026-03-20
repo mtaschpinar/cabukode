@@ -200,7 +200,7 @@
         </div>
       </div>
 
-      <div class="form-row">
+       <div class="form-row">
         <div class="form-group">
           <label>Telefon</label>
           <input type="text" id="f_phone" placeholder="0532 123 45 67"/>
@@ -210,6 +210,60 @@
           <input type="text" id="f_address" placeholder="Mahalle, İlçe"/>
         </div>
       </div>
+
+      <!-- BIO -->
+      <div class="form-group">
+        <label>Hakkımızda / Bio</label>
+        <textarea id="f_bio" rows="3" placeholder="İşletmenizi kısaca tanıtın..."></textarea>
+      </div>
+
+      <!-- SOSYAL MEDYA & İLETIŞİM -->
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px">🔗 İletişim & Sosyal Medya</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>WhatsApp Numarası</label>
+          <input type="text" id="f_whatsapp" placeholder="905321234567"/>
+        </div>
+        <div class="form-group">
+          <label>Google Maps Linki</label>
+          <input type="text" id="f_mapsUrl" placeholder="https://maps.google.com/..."/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Instagram Kullanıcı Adı</label>
+          <input type="text" id="f_instagram" placeholder="ahmetkuafor"/>
+        </div>
+        <div class="form-group">
+          <label>Facebook Kullanıcı Adı</label>
+          <input type="text" id="f_facebook" placeholder="ahmetkuafor"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>TikTok Kullanıcı Adı</label>
+          <input type="text" id="f_tiktok" placeholder="ahmetkuafor"/>
+        </div>
+        <div class="form-group">
+          <label>Web Sitesi</label>
+          <input type="text" id="f_website" placeholder="https://..."/>
+        </div>
+      </div>
+
+      <!-- ÇALIŞMA SAATLERi -->
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px">⏰ Çalışma Saatleri</div>
+      <div id="calismaSaatleriList"></div>
+      <button type="button" class="add-service-btn" onclick="addCalismaRow()" style="margin-bottom:12px">+ Gün Ekle</button>
+
+      <!-- KAMPANYALAR -->
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px">🎉 Kampanyalar / Duyurular</div>
+      <div id="kampanyaList"></div>
+      <button type="button" class="add-service-btn" onclick="addKampanyaRow()" style="margin-bottom:12px">+ Kampanya Ekle</button>
+
+      <!-- MENÜ / ÜRÜN LİSTESİ -->
+      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px">📝 Menü / Ürün Listesi</div>
+      <div id="menuList"></div>
+      <button type="button" class="add-service-btn" onclick="addMenuRow()" style="margin-bottom:12px">+ Ürün/Menü Ekle</button>
 
       <div class="form-group">
         <label>Logo (max 2MB)</label>
@@ -398,6 +452,81 @@ function getServices(){
   }).filter(s=>s.name);
 }
 
+// ── Çalışma Saatleri ─────────────────────────────────────────────────────────────────────────────────────
+const GUNLER = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
+function addCalismaRow(gun='', saat=''){
+  const list = document.getElementById('calismaSaatleriList');
+  const div = document.createElement('div');
+  div.className = 'service-item';
+  const gunOptions = GUNLER.map(g=>`<option value="${g}" ${g===gun?'selected':''}>${g}</option>`).join('');
+  div.innerHTML = `
+    <select style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;color:var(--text)">
+      <option value="">Gün seç</option>${gunOptions}
+    </select>
+    <input type="text" placeholder="09:00 - 19:00 (veya Kapalı)" value="${saat}" style="flex:2"/>
+    <button type="button" class="remove-btn" onclick="this.parentElement.remove()">×</button>`;
+  list.appendChild(div);
+}
+function getCalisma(){
+  const rows = document.querySelectorAll('#calismaSaatleriList .service-item');
+  const obj = {};
+  rows.forEach(r=>{
+    const sel = r.querySelector('select');
+    const inp = r.querySelector('input');
+    if(sel.value && inp.value.trim()) obj[sel.value] = inp.value.trim();
+  });
+  return obj;
+}
+
+// ── Kampanyalar ─────────────────────────────────────────────────────────────────────────────────────
+function addKampanyaRow(baslik='', aciklama=''){
+  const list = document.getElementById('kampanyaList');
+  const div = document.createElement('div');
+  div.className = 'service-item';
+  div.style.flexDirection = 'column';
+  div.style.alignItems = 'stretch';
+  div.style.gap = '6px';
+  div.innerHTML = `
+    <div style="display:flex;gap:6px;align-items:center">
+      <input type="text" placeholder="Kampanya başlığı (ör: %20 İndirim)" value="${baslik}" style="flex:1"/>
+      <button type="button" class="remove-btn" onclick="this.closest('.service-item').remove()">×</button>
+    </div>
+    <input type="text" placeholder="Açıklama (isteğe bağlı)" value="${aciklama}"/>`;
+  list.appendChild(div);
+}
+function getKampanyalar(){
+  const rows = document.querySelectorAll('#kampanyaList .service-item');
+  return Array.from(rows).map(r=>{
+    const inputs = r.querySelectorAll('input');
+    return { baslik: inputs[0].value.trim(), aciklama: inputs[1]?.value.trim()||'' };
+  }).filter(k=>k.baslik);
+}
+
+// ── Menü / Ürün ─────────────────────────────────────────────────────────────────────────────────────
+function addMenuRow(ad='', fiyat='', aciklama=''){
+  const list = document.getElementById('menuList');
+  const div = document.createElement('div');
+  div.className = 'service-item';
+  div.style.flexDirection = 'column';
+  div.style.alignItems = 'stretch';
+  div.style.gap = '6px';
+  div.innerHTML = `
+    <div style="display:flex;gap:6px;align-items:center">
+      <input type="text" placeholder="Ürün/menü adı" value="${ad}" style="flex:2"/>
+      <input type="number" placeholder="₺" value="${fiyat}" min="0" style="width:80px"/>
+      <button type="button" class="remove-btn" onclick="this.closest('.service-item').remove()">×</button>
+    </div>
+    <input type="text" placeholder="Açıklama (isteğe bağlı)" value="${aciklama}"/>`;
+  list.appendChild(div);
+}
+function getMenu(){
+  const rows = document.querySelectorAll('#menuList .service-item');
+  return Array.from(rows).map(r=>{
+    const inputs = r.querySelectorAll('input');
+    return { ad: inputs[0].value.trim(), fiyat: inputs[1].value, aciklama: inputs[2]?.value.trim()||'' };
+  }).filter(m=>m.ad);
+}
+
 // ── Cover önizleme ─────────────────────────────────────────────
 function previewCover(input){
   const prev=document.getElementById('coverPreview');
@@ -423,13 +552,16 @@ function openAddModal(){
   document.getElementById('salonForm').reset();
   document.getElementById('editSlug').value='';
   document.getElementById('servicesList').innerHTML='';
+  document.getElementById('calismaSaatleriList').innerHTML='';
+  document.getElementById('kampanyaList').innerHTML='';
+  document.getElementById('menuList').innerHTML='';
   document.getElementById('logoPreview').classList.remove('show');
   document.getElementById('coverPreview').classList.remove('show');
   document.getElementById('addOverlay').classList.add('show');
 }
 
 function openEditModal(salon){
-  document.getElementById('modalTitle').textContent='Salonu Düzenle';
+  document.getElementById('modalTitle').textContent='İşletmeyi Düzenle';
   document.getElementById('editSlug').value=salon.slug;
   document.getElementById('f_name').value=salon.name;
   document.getElementById('f_owner').value=salon.ownerName;
@@ -437,10 +569,24 @@ function openEditModal(salon){
   document.getElementById('f_iban').value=fmtIBAN(salon.iban);
   document.getElementById('f_phone').value=salon.phone||'';
   document.getElementById('f_address').value=salon.address||'';
+  document.getElementById('f_bio').value=salon.bio||'';
+  document.getElementById('f_whatsapp').value=salon.whatsapp||'';
+  document.getElementById('f_mapsUrl').value=salon.mapsUrl||'';
+  document.getElementById('f_instagram').value=salon.instagram||'';
+  document.getElementById('f_facebook').value=salon.facebook||'';
+  document.getElementById('f_tiktok').value=salon.tiktok||'';
+  document.getElementById('f_website').value=salon.website||'';
   document.getElementById('f_customSlug').value=salon.slug||'';
   document.getElementById('slugPreview').textContent=salon.slug||'...';
   document.getElementById('servicesList').innerHTML='';
   (salon.services||[]).forEach(s=>addServiceRow(s.name,s.price));
+  document.getElementById('calismaSaatleriList').innerHTML='';
+  const calisma = salon.calisma||{};
+  Object.entries(calisma).forEach(([gun,saat])=>addCalismaRow(gun,saat));
+  document.getElementById('kampanyaList').innerHTML='';
+  (salon.kampanyalar||[]).forEach(k=>addKampanyaRow(k.baslik,k.aciklama));
+  document.getElementById('menuList').innerHTML='';
+  (salon.menu||[]).forEach(m=>addMenuRow(m.ad,m.fiyat,m.aciklama));
   if(salon.logoUrl){
     const prev=document.getElementById('logoPreview');
     prev.src=salon.logoUrl; prev.classList.add('show');
@@ -464,6 +610,16 @@ document.getElementById('salonForm').addEventListener('submit', async e=>{
   fd.append('phone',  document.getElementById('f_phone').value);
   fd.append('address',document.getElementById('f_address').value);
   fd.append('services', JSON.stringify(getServices()));
+  fd.append('bio',       document.getElementById('f_bio').value);
+  fd.append('whatsapp',  document.getElementById('f_whatsapp').value);
+  fd.append('mapsUrl',   document.getElementById('f_mapsUrl').value);
+  fd.append('instagram', document.getElementById('f_instagram').value);
+  fd.append('facebook',  document.getElementById('f_facebook').value);
+  fd.append('tiktok',    document.getElementById('f_tiktok').value);
+  fd.append('website',   document.getElementById('f_website').value);
+  fd.append('calisma',   JSON.stringify(getCalisma()));
+  fd.append('kampanyalar', JSON.stringify(getKampanyalar()));
+  fd.append('menu',      JSON.stringify(getMenu()));
   const customSlug = document.getElementById('f_customSlug').value.trim();
   if(customSlug) fd.append('customSlug', customSlug);
   const logo=document.getElementById('f_logo').files[0];
