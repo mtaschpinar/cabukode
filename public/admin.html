@@ -709,7 +709,7 @@ async function loadSalons(){
         <button class="btn btn-green" onclick="showQR('${s.slug}')">📱 QR</button>
         <button class="btn btn-gold" onclick="openStats('${s.slug}','${s.name}')">📊 İstatistik</button>
         <button class="btn btn-ghost" onclick='openEditModal(${JSON.stringify(s)})'>✏️ Düzenle</button>
-        <button class="btn btn-danger" onclick="deleteSalon('${s.slug}')">🗑</button>
+
         <button class="btn btn-ghost" onclick="openStaffModal('${s.slug}','${s.name}')">👥 Çalışanlar</button>
         <a class="btn btn-ghost" href="/${s.slug}" target="_blank">🔗 Sayfa</a>
       </div>
