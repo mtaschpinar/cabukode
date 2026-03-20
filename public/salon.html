@@ -361,6 +361,8 @@
             🔗 Paylaş
           </button>
         </div>
+        <!-- Bio / Hakkımızda -->
+        <div id="bioCard" style="display:none;margin-top:10px;font-size:14px;color:var(--muted);line-height:1.6;padding:0 2px"></div>
       </div>
     </div>
 
@@ -561,21 +563,20 @@ async function loadSalon(){
     // Bio (profil altında)
     if(s.bio){
       const bioEl = document.getElementById('bioCard');
-      bioEl.textContent = s.bio;
-      bioEl.style.display = 'block';
+      if(bioEl){ bioEl.textContent = s.bio; bioEl.style.display = 'block'; }
     }
     // Çalışma Saatleri
     if(s.calisma && Object.keys(s.calisma).length){
       const SIRALAMA = ['Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi','Pazar'];
       const gunler = Object.entries(s.calisma).sort((a,b)=>SIRALAMA.indexOf(a[0])-SIRALAMA.indexOf(b[0]));
       const bugun = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'][new Date().getDay()];
-      document.getElementById('saatlerList').innerHTML = gunler.map(([gun,saat])=>`
+      const saatlerListEl = document.getElementById('saatlerList'); if(saatlerListEl) saatlerListEl.innerHTML = gunler.map(([gun,saat])=>`
         <div class="saat-row ${gun===bugun?'bugun':''}">
           <span class="saat-gun">${gun}</span>
           <span class="saat-val">${saat}</span>
           ${gun===bugun?'<span class="bugun-badge">Bugun</span>':''}
         </div>`).join('');
-      document.getElementById('saatlerSection').style.display='block';
+      const saatSec = document.getElementById('saatlerSection'); if(saatSec) saatSec.style.display='block';
     }
     // Sosyal Medya Simgeleri (sadece WhatsApp, Instagram, Harita - simge olarak)
     const sosyalIcons = [];

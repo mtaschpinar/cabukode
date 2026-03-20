@@ -575,6 +575,7 @@ function previewLogo(input){
 
 // ── Modal aç ──────────────────────────────────────────────────
 function openAddModal(){
+  _salonSubmitting = false;
   document.getElementById('modalTitle').textContent='Yeni İşletme Ekle';
   document.getElementById('salonForm').reset();
   document.getElementById('editSlug').value='';
@@ -630,8 +631,13 @@ function openEditModal(salon){
 }
 
 // ── Form gönder ───────────────────────────────────────────────
+let _salonSubmitting = false;
 document.getElementById('salonForm').addEventListener('submit', async e=>{
   e.preventDefault();
+  if(_salonSubmitting) return;
+  _salonSubmitting = true;
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  if(submitBtn){ submitBtn.disabled=true; submitBtn.textContent='Kaydediliyor...'; }
   const slug=document.getElementById('editSlug').value;
   const fd=new FormData();
   fd.append('name',   document.getElementById('f_name').value);
@@ -666,8 +672,9 @@ document.getElementById('salonForm').addEventListener('submit', async e=>{
   const method = slug ? 'PUT' : 'POST';
   const res=await fetch(url,{method,body:fd});
   const data=await res.json();
-  if(data.error){ showToast('Hata: '+data.error,'#e94560'); return; }
+  if(data.error){ showToast('Hata: '+data.error,'#e94560'); _salonSubmitting=false; if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='Kaydet';} return; }
   showToast(slug?'İşletme güncellendi!':'İşletme eklendi!');
+  _salonSubmitting = false;
   closeModal('addOverlay');
   loadSalons();
 });
