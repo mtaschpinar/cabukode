@@ -193,7 +193,9 @@
     #bioSection .card-title{margin-bottom:8px}
 
     /* SOSYAL MEDYA */
-    .sosyal-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
+    .sosyal-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.1);transition:transform .15s;text-decoration:none;}
+.sosyal-icon:hover{transform:scale(1.08)}
+.sosyal-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .15s;-webkit-tap-highlight-color:transparent}
     .sosyal-btn:active{opacity:.75}
     .sosyal-btn.whatsapp{background:#dcfce7;color:#16a34a;border:1.5px solid #bbf7d0}
     .sosyal-btn.maps{background:#fef3c7;color:#d97706;border:1.5px solid #fde68a}
@@ -346,6 +348,10 @@
             </div>
           </div>
         </div>
+        <!-- Sosyal Medya Simgeleri -->
+        <div id="sosyalIcons" style="display:none;margin-top:8px">
+          <div id="sosyalIconsInner" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+        </div>
         <!-- Aksiyon Butonları -->
         <div class="salon-actions">
           <a class="action-btn phone" id="phoneBtn" href="#" style="display:none">
@@ -358,27 +364,15 @@
       </div>
     </div>
 
-    <!-- Bio -->
-    <div id="bioSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div class="card-title">🏢 Hakkımızda</div>
-      <p id="bioCard" style="font-size:14px;color:var(--muted);line-height:1.7"></p>
-    </div>
-
     <!-- Hizmetler (Açılır/Kapanır) -->
     <div class="services-card" id="servicesCard" style="display:none">
       <div class="services-toggle" onclick="toggleServices()">
-        <span>🛠 Hizmetler</span>
+        <span id="servicesLabel">🛠 Hizmetler</span>
         <span class="toggle-arrow" id="servicesArrow">▼</span>
       </div>
       <div class="services-body" id="servicesBody" style="display:none">
         <div id="servicesList"></div>
       </div>
-    </div>
-
-    <!-- Sosyal Medya & İletişim -->
-    <div id="sosyalSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div class="card-title">🔗 İletişim & Sosyal Medya</div>
-      <div id="sosyalLinks" style="display:flex;flex-wrap:wrap;gap:8px"></div>
     </div>
 
     <!-- Çalışma Saatleri -->
@@ -387,94 +381,16 @@
       <div id="saatlerList"></div>
     </div>
 
-    <!-- Kampanyalar -->
-    <div id="kampanyaSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div class="card-title">🎉 Kampanyalar & Duyurular</div>
-      <div id="kampanyaListEl"></div>
-    </div>
-
     <!-- Menü / Ürün Listesi -->
-    <div id="menuSection" style="display:none;background:var(--card);border-radius:20px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div class="card-title">📝 Menü / Ürünler</div>
-      <div id="menuListEl"></div>
-    </div>
-
-    <!-- Banka Kartı -->
-    <div class="bank-card">
-      <div class="bank-header">
-        <div class="bank-avatar" id="bankAvatar">B</div>
-        <div>
-          <h3 id="bankName">Banka</h3>
-          <p>Hesap Bilgileri</p>
-        </div>
+    <div class="services-card" id="menuSection" style="display:none">
+      <div class="services-toggle" onclick="toggleMenu()">
+        <span id="menuLabel">📝 Menü / Ürünler</span>
+        <span class="toggle-arrow" id="menuArrow">▼</span>
       </div>
-
-      <!-- Alıcı Adı -->
-      <div class="info-row">
-        <div class="info-icon" id="receiverInitial">MA</div>
-        <div class="info-content">
-          <div class="info-label">Alıcı Adı</div>
-          <div class="info-value" id="receiverName">Yükleniyor...</div>
-        </div>
-        <button class="copy-mini" id="copyNameBtn" onclick="copyName()">Kopyala</button>
-      </div>
-
-      <!-- IBAN -->
-      <div class="info-row">
-        <div class="info-icon iban-icon">IBAN</div>
-        <div class="info-content">
-          <div class="info-label">IBAN Numarası</div>
-          <div class="info-value mono" id="ibanDisplay">TR00 0000 0000 0000 0000 0000 00</div>
-        </div>
-        <button class="copy-mini" id="copyIbanBtn" onclick="copyIBAN()">Kopyala</button>
-      </div>
-
-      <!-- Kopyalandı mesajı -->
-      <div class="next-step" id="nextStep">
-        ✅ IBAN kopyalandı!
-        <span>Banka uygulamanı aç → EFT / Havale → Yapıştır → Tutarı gir → Gönder</span>
+      <div class="services-body" id="menuBody" style="display:none">
+        <div id="menuListEl"></div>
       </div>
     </div>
-
-    <!-- İçerik İçi Reklam (inline) -->
-    <div class="ad-inline" id="adInline">
-      <div class="ad-label">Sponsorlu</div>
-      <a class="ad-inner" href="#" id="adInlineLink">
-        <div class="ad-icon" id="adInlineIcon">📢</div>
-        <div class="ad-text">
-          <strong id="adInlineTitle">Reklam Alanı</strong>
-          <span id="adInlineSubtitle"></span>
-        </div>
-        <div class="ad-cta">Gör</div>
-      </a>
-    </div>
-
-    <!-- Mesaj / Randevu Formu -->
-    <div class="bank-card" id="mesajSection">
-      <div class="card-title">💬 Mesaj Gönder / Randevu Al</div>
-      <div id="mesajForm">
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <input id="mesaj_ad" type="text" placeholder="Adınız *" maxlength="60"
-            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
-            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
-          <input id="mesaj_tel" type="tel" placeholder="Telefon (isteğe bağlı)" maxlength="20"
-            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
-            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
-          <textarea id="mesaj_metin" rows="3" placeholder="Mesajınız / randevu talebiniz *" maxlength="500"
-            style="border:1.5px solid var(--border);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;resize:none;outline:none;color:var(--text);background:#fafafa;transition:border-color .2s"
-            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></textarea>
-          <button onclick="gondermesaj()" id="mesajBtn"
-            style="background:var(--accent);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s"
-            onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'">
-            📨 Gönder
-          </button>
-        </div>
-      </div>
-      <div id="mesajTesekur" style="display:none;text-align:center;padding:16px 0;color:var(--green);font-weight:700;font-size:15px">
-        🎉 Mesajınız iletildi! En kısa sürede dönüş yapılacaktır.
-      </div>
-    </div>
-
     <!-- Nasıl Ödeme Yapılır? (Açılır/Kapanır) -->
     <div class="steps-card" style="padding:0;overflow:hidden">
       <button onclick="toggleOdeme()" style="width:100%;background:none;border:none;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;color:var(--text);font-family:inherit;-webkit-tap-highlight-color:transparent">
@@ -607,19 +523,21 @@ async function loadSalon(){
     const fmt = s.iban.replace(/\s/g,'').match(/.{1,4}/g)?.join(' ')||s.iban;
     document.getElementById('ibanDisplay').textContent = fmt;
 
-    if(s.services && s.services.length){
+    if(s.servicesActive !== false && s.services && s.services.length){
       const list = document.getElementById('servicesList');
       list.innerHTML = s.services.map(sv=>`
         <div class="service-row">
           <span class="service-name">${sv.name}</span>
           <span class="service-price">₺${sv.price}</span>
         </div>`).join('');
+      document.getElementById('servicesLabel').textContent = '🛠 ' + (s.servicesLabel || 'Hizmetler');
       document.getElementById('servicesCard').style.display='block';
     }
-    // Bio
+    // Bio (profil altında)
     if(s.bio){
-      document.getElementById('bioCard').textContent = s.bio;
-      document.getElementById('bioSection').style.display='block';
+      const bioEl = document.getElementById('bioCard');
+      bioEl.textContent = s.bio;
+      bioEl.style.display = 'block';
     }
     // Çalışma Saatleri
     if(s.calisma && Object.keys(s.calisma).length){
@@ -634,36 +552,28 @@ async function loadSalon(){
         </div>`).join('');
       document.getElementById('saatlerSection').style.display='block';
     }
-    // Sosyal Medya & İletişim
-    const sosyalLinks = [];
-    if(s.whatsapp) sosyalLinks.push(`<a class="sosyal-btn whatsapp" href="https://wa.me/${s.whatsapp}" target="_blank">💬 WhatsApp</a>`);
-    if(s.mapsUrl)  sosyalLinks.push(`<a class="sosyal-btn maps" href="${s.mapsUrl}" target="_blank">📍 Haritada Gör</a>`);
-    if(s.instagram) sosyalLinks.push(`<a class="sosyal-btn instagram" href="https://instagram.com/${s.instagram}" target="_blank">📸 Instagram</a>`);
-    if(s.facebook)  sosyalLinks.push(`<a class="sosyal-btn facebook" href="https://facebook.com/${s.facebook}" target="_blank">👤 Facebook</a>`);
-    if(s.tiktok)    sosyalLinks.push(`<a class="sosyal-btn tiktok" href="https://tiktok.com/@${s.tiktok}" target="_blank">🎵 TikTok</a>`);
-    if(s.website)   sosyalLinks.push(`<a class="sosyal-btn website" href="${s.website}" target="_blank">🌐 Web Sitesi</a>`);
-    if(sosyalLinks.length){
-      document.getElementById('sosyalLinks').innerHTML = sosyalLinks.join('');
-      document.getElementById('sosyalSection').style.display='block';
-    }
-    // Kampanyalar
-    if(s.kampanyalar && s.kampanyalar.length){
-      document.getElementById('kampanyaListEl').innerHTML = s.kampanyalar.map(k=>`
-        <div class="kampanya-item">
-          <div class="kampanya-baslik">🎉 ${k.baslik}</div>
-          ${k.aciklama?`<div class="kampanya-aciklama">${k.aciklama}</div>`:''}
-        </div>`).join('');
-      document.getElementById('kampanyaSection').style.display='block';
+    // Sosyal Medya Simgeleri (sadece WhatsApp, Instagram, Harita - simge olarak)
+    const sosyalIcons = [];
+    if(s.whatsapp) sosyalIcons.push(`<a class="sosyal-icon wa" href="https://wa.me/${s.whatsapp}" target="_blank" title="WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></a>`);
+    if(s.mapsUrl)  sosyalIcons.push(`<a class="sosyal-icon maps" href="${s.mapsUrl}" target="_blank" title="Haritada Gör"><svg width="28" height="28" viewBox="0 0 24 24" fill="#EA4335"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></a>`);
+    if(s.instagram) sosyalIcons.push(`<a class="sosyal-icon ig" href="https://instagram.com/${s.instagram}" target="_blank" title="Instagram"><svg width="28" height="28" viewBox="0 0 24 24" fill="url(#igGrad)"><defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="25%" stop-color="#e6683c"/><stop offset="50%" stop-color="#dc2743"/><stop offset="75%" stop-color="#cc2366"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>`);
+    if(s.facebook)  sosyalIcons.push(`<a class="sosyal-icon fb" href="https://facebook.com/${s.facebook}" target="_blank" title="Facebook"><svg width="28" height="28" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>`);
+    if(s.tiktok)    sosyalIcons.push(`<a class="sosyal-icon tt" href="https://tiktok.com/@${s.tiktok}" target="_blank" title="TikTok"><svg width="28" height="28" viewBox="0 0 24 24" fill="#000"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg></a>`);
+    if(s.website)   sosyalIcons.push(`<a class="sosyal-icon web" href="${s.website}" target="_blank" title="Web Sitesi"><svg width="28" height="28" viewBox="0 0 24 24" fill="#6c63ff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></a>`);
+    if(sosyalIcons.length){
+      document.getElementById('sosyalIconsInner').innerHTML = sosyalIcons.join('');
+      document.getElementById('sosyalIcons').style.display = 'block';
     }
     // Menü / Ürün Listesi
-    if(s.menu && s.menu.length){
+    if(s.menuActive && s.menu && s.menu.length){
+      document.getElementById('menuLabel').textContent = '📝 ' + (s.menuLabel || 'Menü / Ürünler');
       document.getElementById('menuListEl').innerHTML = s.menu.map(m=>`
-        <div class="menu-item">
-          <div class="menu-sol">
-            <span class="menu-ad">${m.ad}</span>
-            ${m.aciklama?`<span class="menu-aciklama">${m.aciklama}</span>`:''}
+        <div class="service-row">
+          <div style="display:flex;flex-direction:column">
+            <span class="service-name">${m.ad}</span>
+            ${m.aciklama?`<span style="font-size:12px;color:var(--muted)">${m.aciklama}</span>`:''}
           </div>
-          ${m.fiyat?`<span class="menu-fiyat">₺${m.fiyat}</span>`:''}
+          ${m.fiyat?`<span class="service-price">₺${m.fiyat}</span>`:''}
         </div>`).join('');
       document.getElementById('menuSection').style.display='block';
     }
@@ -756,6 +666,13 @@ function fallback(text,cb){
 let selectedRating = 0;
 const HINTS = ['','Kötü 😞','Fena değil 😐','İyi 🙂','Harika 😄','Mükemmel 🤩'];
 
+function toggleMenu(){
+  const body = document.getElementById('menuBody');
+  const arrow = document.getElementById('menuArrow');
+  const open = body.style.display === 'block';
+  body.style.display = open ? 'none' : 'block';
+  arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
 function toggleServices(){
   const body = document.getElementById('servicesBody');
   const arrow = document.getElementById('servicesArrow');

@@ -261,9 +261,23 @@
       <button type="button" class="add-service-btn" onclick="addKampanyaRow()" style="margin-bottom:12px">+ Kampanya Ekle</button>
 
       <!-- MENÜ / ÜRÜN LİSTESİ -->
-      <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;margin-top:4px">📝 Menü / Ürün Listesi</div>
-      <div id="menuList"></div>
-      <button type="button" class="add-service-btn" onclick="addMenuRow()" style="margin-bottom:12px">+ Ürün/Menü Ekle</button>
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">📝 Menü / Ürün Listesi</div>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text)">
+            <input type="checkbox" id="f_menuActive" checked style="width:16px;height:16px;cursor:pointer"/>
+            Sitede Göster
+          </label>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bölüm Başlığı</label>
+            <input type="text" id="f_menuLabel" placeholder="Menü / Ürünler" value="Menü / Ürünler"/>
+          </div>
+        </div>
+        <div id="menuList"></div>
+        <button type="button" class="add-service-btn" onclick="addMenuRow()">+ Ürün/Menü Ekle</button>
+      </div>
 
       <div class="form-group">
         <label>Logo (max 2MB)</label>
@@ -276,8 +290,21 @@
         <img id="coverPreview" class="logo-preview" style="width:100%;height:80px;border-radius:10px;" src="" alt=""/>
       </div>
 
-      <div class="form-group">
-        <label>Hizmet Tarifesi</label>
+      <!-- HİZMETLER -->
+      <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">🛠 Hizmetler</div>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text)">
+            <input type="checkbox" id="f_servicesActive" checked style="width:16px;height:16px;cursor:pointer"/>
+            Sitede Göster
+          </label>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Bölüm Başlığı</label>
+            <input type="text" id="f_servicesLabel" placeholder="Hizmetler" value="Hizmetler"/>
+          </div>
+        </div>
         <div class="services-list" id="servicesList"></div>
         <button type="button" class="add-service-btn" onclick="addServiceRow()">+ Hizmet Ekle</button>
       </div>
@@ -570,6 +597,10 @@ function openEditModal(salon){
   document.getElementById('f_phone').value=salon.phone||'';
   document.getElementById('f_address').value=salon.address||'';
   document.getElementById('f_bio').value=salon.bio||'';
+  document.getElementById('f_servicesActive').checked = salon.servicesActive !== false;
+  document.getElementById('f_menuActive').checked = salon.menuActive !== false;
+  document.getElementById('f_servicesLabel').value = salon.servicesLabel || 'Hizmetler';
+  document.getElementById('f_menuLabel').value = salon.menuLabel || 'Menü / Ürünler';
   document.getElementById('f_whatsapp').value=salon.whatsapp||'';
   document.getElementById('f_mapsUrl').value=salon.mapsUrl||'';
   document.getElementById('f_instagram').value=salon.instagram||'';
@@ -611,6 +642,10 @@ document.getElementById('salonForm').addEventListener('submit', async e=>{
   fd.append('address',document.getElementById('f_address').value);
   fd.append('services', JSON.stringify(getServices()));
   fd.append('bio',       document.getElementById('f_bio').value);
+  fd.append('servicesActive', document.getElementById('f_servicesActive').checked);
+  fd.append('menuActive',     document.getElementById('f_menuActive').checked);
+  fd.append('servicesLabel',  document.getElementById('f_servicesLabel').value || 'Hizmetler');
+  fd.append('menuLabel',      document.getElementById('f_menuLabel').value || 'Menü / Ürünler');
   fd.append('whatsapp',  document.getElementById('f_whatsapp').value);
   fd.append('mapsUrl',   document.getElementById('f_mapsUrl').value);
   fd.append('instagram', document.getElementById('f_instagram').value);
@@ -769,7 +804,8 @@ async function loadAds(){
       </div>
       ${ad.link ? `<div class="iban-badge">🔗 ${ad.link}</div>` : ''}
       <div class="salon-actions">
-        <button class="btn btn-gold" onclick="editAd('${ad._id}')">Düzenle</button>
+        <button class="btn btn-gold" onclick="editAd('${ad._id}')">✏️ Düzenle</button>
+        ${ad.type === 'banner' ? '<span style="background:#6366f122;color:#6366f1;border:1px solid #6366f144;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">📌 Sabit Banner</span>' : ''}
         <button class="btn btn-ghost" onclick="toggleAd('${ad._id}', ${!ad.active})">${ad.active ? 'Pasif Yap' : 'Aktif Yap'}</button>
         <button class="btn btn-danger" onclick="deleteAd('${ad._id}')">Sil</button>
       </div>
@@ -893,6 +929,51 @@ document.getElementById('staffForm').addEventListener('submit', async e => {
 let allBasvurular = [];
 let activeFilter = 'hepsi';
 
+
+// ── Başvuru Düzenleme ─────────────────────────────────────────────────────
+let _basvuruList = [];
+async function editBasvuru(id) {
+  const b = _basvuruList.find(x => x._id === id);
+  if (!b) return;
+  document.getElementById('be_id').value = b._id;
+  document.getElementById('be_isletmeAdi').value = b.isletmeAdi || '';
+  document.getElementById('be_isletmeTuru').value = b.isletmeTuru || '';
+  document.getElementById('be_sahipAdi').value = b.sahipAdi || '';
+  document.getElementById('be_telefon').value = b.telefon || '';
+  document.getElementById('be_adres').value = b.adres || '';
+  document.getElementById('be_hizmetler').value = b.hizmetler || '';
+  document.getElementById('be_iban').value = b.iban || '';
+  document.getElementById('be_banka').value = b.banka || '';
+  document.getElementById('be_slug').value = b.slug || '';
+  document.getElementById('basvuruEditOverlay').style.display = 'flex';
+}
+document.getElementById('basvuruEditForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('be_id').value;
+  const data = {
+    isletmeAdi: document.getElementById('be_isletmeAdi').value,
+    isletmeTuru: document.getElementById('be_isletmeTuru').value,
+    sahipAdi: document.getElementById('be_sahipAdi').value,
+    telefon: document.getElementById('be_telefon').value,
+    adres: document.getElementById('be_adres').value,
+    hizmetler: document.getElementById('be_hizmetler').value,
+    iban: document.getElementById('be_iban').value,
+    banka: document.getElementById('be_banka').value,
+    slug: document.getElementById('be_slug').value,
+  };
+  const res = await fetch(`/api/basvurular/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (res.ok) {
+    closeModal('basvuruEditOverlay');
+    await loadBasvurular();
+    showToast('Başvuru güncellendi');
+  } else {
+    showToast('Hata oluştu', '#c0392b');
+  }
+});
 async function loadBasvurular() {
   try {
     const res = await fetch('/api/basvurular');
@@ -927,6 +1008,7 @@ function renderBasvurular() {
       (activeFilter === 'hepsi' ? 'Henüz başvuru yok.' : 'Bu kategoride başvuru yok.') + '</div>';
     return;
   }
+  _basvuruList = list;
   el.innerHTML = list.map(b => {
     const durumColor = b.durum === 'bekliyor' ? '#f59e0b' : b.durum === 'onaylandi' ? '#10b981' : '#ef4444';
     const durumLabel = b.durum === 'bekliyor' ? '⏳ Bekliyor' : b.durum === 'onaylandi' ? '✅ Onaylandı' : '❌ Reddedildi';
@@ -955,6 +1037,7 @@ function renderBasvurular() {
           <span style="background:${durumColor}22;color:${durumColor};border:1px solid ${durumColor}44;border-radius:8px;padding:4px 12px;font-size:13px;font-weight:700;white-space:nowrap">${durumLabel}</span>
           ${b.durum === 'bekliyor' ? `
           <div style="display:flex;gap:8px">
+            <button onclick="editBasvuru('${b._id}')" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">✏️ Düzenle</button>
             <button onclick="onayla('${b._id}')" style="background:#10b981;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">✅ Onayla</button>
             <button onclick="openRedModal('${b._id}')" style="background:#ef4444;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer">❌ Reddet</button>
           </div>` : ''}
@@ -1015,5 +1098,61 @@ async function silBasvuru(id) {
 loadSalons();
 loadBasvurular();
 </script>
+
+<!-- BAŞVURU DÜZENLE MODAL -->
+<div class="overlay" id="basvuruEditOverlay" style="display:none"><div class="modal-wrap">
+  <div class="modal">
+    <h3>Başvuruyu Düzenle</h3>
+    <form id="basvuruEditForm">
+      <input type="hidden" id="be_id"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>İşletme Adı *</label>
+          <input type="text" id="be_isletmeAdi" required/>
+        </div>
+        <div class="form-group">
+          <label>İşletme Türü</label>
+          <input type="text" id="be_isletmeTuru" placeholder="Berber, Galeri, Fırın..."/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Yetkili Adı *</label>
+          <input type="text" id="be_sahipAdi" required/>
+        </div>
+        <div class="form-group">
+          <label>Telefon *</label>
+          <input type="tel" id="be_telefon" required/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Adres</label>
+        <input type="text" id="be_adres"/>
+      </div>
+      <div class="form-group">
+        <label>Hizmetler (virgülle ayırın)</label>
+        <input type="text" id="be_hizmetler" placeholder="Saç Kesimi, Sakal, Boya"/>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>IBAN</label>
+          <input type="text" id="be_iban" placeholder="TR00 0000..."/>
+        </div>
+        <div class="form-group">
+          <label>Banka</label>
+          <input type="text" id="be_banka"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Site Adresi (cabukode.com/...)</label>
+        <input type="text" id="be_slug" placeholder="ahmetkuafor"/>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button type="submit" class="btn btn-primary" style="flex:1;padding:13px">💾 Kaydet</button>
+        <button type="button" class="btn btn-ghost" onclick="closeModal('basvuruEditOverlay')">İptal</button>
+      </div>
+    </form>
+  </div>
+</div></div>
 </body>
 </html>
