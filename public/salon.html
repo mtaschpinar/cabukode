@@ -522,7 +522,13 @@ async function loadSalon(){
       document.getElementById('salonSep').style.display = 'inline';
     }
     if(s.logoUrl){
-      document.getElementById('salonLogo').innerHTML = `<img src="${s.logoUrl}" alt=""/>`;
+      const logoEl = document.getElementById('salonLogo');
+      const logoImg = document.createElement('img');
+      logoImg.src = s.logoUrl;
+      logoImg.alt = '';
+      logoImg.onerror = () => { logoEl.innerHTML = '✂️'; };
+      logoEl.innerHTML = '';
+      logoEl.appendChild(logoImg);
     }
     // Cover görseli
     if(s.coverUrl){
@@ -530,6 +536,7 @@ async function loadSalon(){
       const img = document.createElement('img');
       img.src = s.coverUrl;
       img.alt = '';
+      img.onerror = () => { img.remove(); };
       cover.insertBefore(img, cover.firstChild);
       document.getElementById('coverPattern').style.display = 'none';
       document.getElementById('coverOverlay').style.display = 'block';

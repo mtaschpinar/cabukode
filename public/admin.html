@@ -692,7 +692,7 @@ async function loadSalons(){
     <div class="salon-card">
       <div class="salon-card-top">
         <div class="salon-logo">
-          ${s.logoUrl ? `<img src="${s.logoUrl}" alt=""/>` : '✂️'}
+          ${s.logoUrl ? `<img src="${s.logoUrl}" alt="" onerror="this.style.display='none';this.parentNode.innerHTML='🏢'"/>` : '🏢'}
         </div>
         <div class="salon-info">
           <h3>${s.name}</h3>

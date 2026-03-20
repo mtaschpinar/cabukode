@@ -5,7 +5,31 @@ const { v4: uuidv4 } = require('uuid');
 const { Pool } = require('pg');
 const path = require('path');
 const fs   = require('fs');
+const cloudinary = require('cloudinary').v2;
 const app  = express();
+
+// Cloudinary yapılandırması
+if (process.env.CLOUDINARY_URL) {
+  // CLOUDINARY_URL ortam değişkeni varsa otomatik parse edilir
+} else if (process.env.CLOUDINARY_CLOUD_NAME) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key:    process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+}
+const USE_CLOUDINARY = !!(process.env.CLOUDINARY_URL || process.env.CLOUDINARY_CLOUD_NAME);
+
+// Buffer'dan Cloudinary'e yükle
+async function uploadToCloudinary(buffer, folder) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: `cabukode/${folder}`, resource_type: 'image' },
+      (err, result) => err ? reject(err) : resolve(result.secure_url)
+    );
+    stream.end(buffer);
+  });
+}
 const PORT = process.env.PORT || 8091;
 
 // ── PostgreSQL bağlantısı ────────────────────────────────────────────────────
@@ -77,11 +101,23 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 fs.mkdirSync(path.join(__dirname, 'public/uploads'), { recursive: true });
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, 'public/uploads')),
-  filename:    (req, file, cb) => cb(null, Date.now() + '_' + file.originalname.replace(/\s/g,'_')),
-});
+// Cloudinary varsa memory, yoksa disk
+const storage = USE_CLOUDINARY
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => cb(null, path.join(__dirname, 'public/uploads')),
+      filename:    (req, file, cb) => cb(null, Date.now() + '_' + file.originalname.replace(/\s/g,'_')),
+    });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+
+// Dosyadan URL üret (Cloudinary veya lokal)
+async function getFileUrl(file, folder) {
+  if (!file) return null;
+  if (USE_CLOUDINARY) {
+    return await uploadToCloudinary(file.buffer, folder);
+  }
+  return '/uploads/' + file.filename;
+}
 
 // ── SALON API ──────────────────────────────────────────────────────────────
 
@@ -110,8 +146,8 @@ app.post('/api/salons', upload.fields([{name:'logo',maxCount:1},{name:'cover',ma
             calisma, kampanyalar, menu, servicesLabel, menuLabel } = req.body;
     const slugBase = customSlug ? toSlug(customSlug) : toSlug(ownerName || name);
     const slug = await generateSlug(slugBase || uuidv4().split('-')[0]);
-    const logoUrl  = req.files?.logo?.[0]  ? '/uploads/' + req.files.logo[0].filename  : null;
-    const coverUrl = req.files?.cover?.[0] ? '/uploads/' + req.files.cover[0].filename : null;
+    const logoUrl  = await getFileUrl(req.files?.logo?.[0], 'logos');
+    const coverUrl = await getFileUrl(req.files?.cover?.[0], 'covers');
 
     let parsedServices = []; try { parsedServices = JSON.parse(services || '[]'); } catch(e) {}
     let parsedCalisma  = {}; try { parsedCalisma  = JSON.parse(calisma  || '{}'); } catch(e) {}
@@ -161,8 +197,8 @@ app.put('/api/salons/:slug', upload.fields([{name:'logo',maxCount:1},{name:'cove
     if (!existing.rows[0]) return res.status(404).json({ error: 'Bulunamadı' });
     const cur = existing.rows[0];
 
-    const logoUrl  = req.files?.logo?.[0]  ? '/uploads/' + req.files.logo[0].filename  : cur.logo_url;
-    const coverUrl = req.files?.cover?.[0] ? '/uploads/' + req.files.cover[0].filename : cur.cover_url;
+    const logoUrl  = req.files?.logo?.[0]  ? await getFileUrl(req.files.logo[0], 'logos')   : cur.logo_url;
+    const coverUrl = req.files?.cover?.[0] ? await getFileUrl(req.files.cover[0], 'covers') : cur.cover_url;
 
     // Slug değişimi
     let newSlug = req.params.slug;
