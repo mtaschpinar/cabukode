@@ -39,6 +39,7 @@ db.salons  = new Datastore({ filename: path.join(__dirname, 'data/salons.db'),  
 db.visits  = new Datastore({ filename: path.join(__dirname, 'data/visits.db'),  autoload: true });
 db.reviews = new Datastore({ filename: path.join(__dirname, 'data/reviews.db'), autoload: true });
 db.ads     = new Datastore({ filename: path.join(__dirname, 'data/ads.db'),     autoload: true });
+db.staff   = new Datastore({ filename: path.join(__dirname, 'data/staff.db'),   autoload: true });
 fs.mkdirSync(path.join(__dirname, 'data'), { recursive: true });
 fs.mkdirSync(path.join(__dirname, 'public/uploads'), { recursive: true });
 
@@ -259,6 +260,40 @@ app.post('/api/ads/:id/click', (req, res) => {
 // Reklam gösterim sayısı artır
 app.post('/api/ads/:id/view', (req, res) => {
   db.ads.update({ _id: req.params.id }, { $inc: { views: 1 } }, {}, () => res.json({ ok: true }));
+});
+
+// ── ÇALIŞAN API ─────────────────────────────────────────────────────────────────────────────────────
+
+// Salona ait çalışanları getir
+app.get('/api/staff/:slug', (req, res) => {
+  db.staff.find({ salonSlug: req.params.slug }).sort({ createdAt: 1 }).exec((err, docs) => {
+    res.json(docs);
+  });
+});
+
+// Çalışan ekle
+app.post('/api/staff/:slug', upload.single('photo'), (req, res) => {
+  const { name, title, phone } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: 'İsim zorunlu' });
+  const photoUrl = req.file ? '/uploads/' + req.file.filename : null;
+  const member = {
+    _id: uuidv4(),
+    salonSlug: req.params.slug,
+    name: name.trim(),
+    title: (title || '').trim(),
+    phone: (phone || '').replace(/\s/g, ''),
+    photoUrl,
+    createdAt: new Date(),
+  };
+  db.staff.insert(member, (err, doc) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(doc);
+  });
+});
+
+// Çalışan sil
+app.delete('/api/staff/:id', (req, res) => {
+  db.staff.remove({ _id: req.params.id }, {}, (err) => res.json({ ok: true }));
 });
 
 // ── YORUM API ───────────────────────────────────────────────────────────────────────────────────────
